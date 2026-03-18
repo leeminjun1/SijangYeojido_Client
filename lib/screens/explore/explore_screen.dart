@@ -6,6 +6,8 @@ import '../../data/mock_data.dart';
 
 import '../map/store_detail_screen.dart';
 import '../../widgets/premium_placeholder.dart';
+import '../../widgets/shrinkable_button.dart';
+import 'search_screen.dart';
 
 class ExploreScreen extends StatefulWidget {
   const ExploreScreen({super.key});
@@ -15,9 +17,7 @@ class ExploreScreen extends StatefulWidget {
 }
 
 class _ExploreScreenState extends State<ExploreScreen> {
-  final _searchController = TextEditingController();
   String _selectedCategory = '전체';
-  String _searchQuery = '';
 
   final List<String> _categories = ['전체', '먹거리', '생선/해산물', '청과/야채', '포목/직물'];
 
@@ -26,14 +26,6 @@ class _ExploreScreenState extends State<ExploreScreen> {
     if (_selectedCategory != '전체') {
       stores = stores.where((s) => s.category == _selectedCategory).toList();
     }
-    if (_searchQuery.isNotEmpty) {
-      stores = stores
-          .where((s) =>
-              s.name.contains(_searchQuery) ||
-              s.category.contains(_searchQuery) ||
-              s.items.any((i) => i.name.contains(_searchQuery)))
-          .toList();
-    }
     return stores;
   }
 
@@ -41,7 +33,6 @@ class _ExploreScreenState extends State<ExploreScreen> {
 
   @override
   void dispose() {
-    _searchController.dispose();
     super.dispose();
   }
 
@@ -82,43 +73,45 @@ class _ExploreScreenState extends State<ExploreScreen> {
     return SliverToBoxAdapter(
       child: Padding(
         padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-        child: Container(
-          height: 48,
-          decoration: BoxDecoration(
-            color: AppColors.surface,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: AppColors.border),
-          ),
-          child: TextField(
-            controller: _searchController,
-            onChanged: (v) => setState(() => _searchQuery = v),
-            style: const TextStyle(fontSize: 15, color: AppColors.textPrimary),
-            decoration: InputDecoration(
-              hintText: '점포명, 품목으로 검색',
-              hintStyle: const TextStyle(
-                fontSize: 15,
-                color: AppColors.textTertiary,
-              ),
-              prefixIcon: const Icon(
-                Icons.search,
-                color: AppColors.textTertiary,
-                size: 20,
-              ),
-              suffixIcon: _searchQuery.isNotEmpty
-                  ? GestureDetector(
-                      onTap: () {
-                        _searchController.clear();
-                        setState(() => _searchQuery = '');
-                      },
-                      child: const Icon(
-                        Icons.close,
-                        color: AppColors.textTertiary,
-                        size: 18,
-                      ),
-                    )
-                  : null,
-              border: InputBorder.none,
-              contentPadding: const EdgeInsets.symmetric(vertical: 14),
+        child: ShrinkableButton(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const SearchScreen()),
+            );
+          },
+          child: Container(
+            height: 52,
+            decoration: BoxDecoration(
+              color: AppColors.surface,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: AppColors.border.withValues(alpha: 0.5)),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.02),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Row(
+              children: [
+                const Icon(
+                  Icons.search_rounded,
+                  color: AppColors.primary,
+                  size: 22,
+                ),
+                const SizedBox(width: 12),
+                Text(
+                  '점포명, 품목으로 검색',
+                  style: TextStyle(
+                    fontSize: 15,
+                    color: AppColors.textTertiary,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
             ),
           ),
         ),

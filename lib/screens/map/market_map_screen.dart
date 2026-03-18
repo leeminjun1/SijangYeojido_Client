@@ -24,7 +24,7 @@ class _MarketMapScreenState extends State<MarketMapScreen> with SingleTickerProv
   bool _filterCard = false;
 
   String _selectedCategory = '전체';
-  String? _routeTargetStoreId;
+  final List<String> _routeTargetStoreIds = [];
 
   final _searchController = TextEditingController();
   final _sheetController = DraggableScrollableController();
@@ -76,7 +76,7 @@ class _MarketMapScreenState extends State<MarketMapScreen> with SingleTickerProv
       stores: _filteredStores,
       pois: MockData.pois,
       selectedStoreId: _selectedStoreId,
-      routeTargetStoreId: _routeTargetStoreId,
+      routeTargetStoreIds: _routeTargetStoreIds,
     );
     
     // Account for current transformation
@@ -89,7 +89,9 @@ class _MarketMapScreenState extends State<MarketMapScreen> with SingleTickerProv
     if (tappedStore != null) {
       setState(() {
         _selectedStoreId = tappedStore.id;
-        _routeTargetStoreId = tappedStore.id;
+        if (!_routeTargetStoreIds.contains(tappedStore.id)) {
+          _routeTargetStoreIds.add(tappedStore.id);
+        }
       });
       _animateToStore(tappedStore);
       
@@ -147,7 +149,7 @@ class _MarketMapScreenState extends State<MarketMapScreen> with SingleTickerProv
       _selectedCategory = '전체';
       _filterOpen = false;
       _filterCard = false;
-      _routeTargetStoreId = null;
+      _routeTargetStoreIds.clear();
     });
   }
 
@@ -202,7 +204,7 @@ class _MarketMapScreenState extends State<MarketMapScreen> with SingleTickerProv
                           stores: _filteredStores,
                           pois: MockData.pois,
                           selectedStoreId: _selectedStoreId,
-                          routeTargetStoreId: _routeTargetStoreId,
+                          routeTargetStoreIds: _routeTargetStoreIds,
                         ),
                         size: _mapSize,
                       );
@@ -503,7 +505,9 @@ class _MarketMapScreenState extends State<MarketMapScreen> with SingleTickerProv
                                   onTap: () {
                                     setState(() {
                                       _selectedStoreId = store.id;
-                                      _routeTargetStoreId = store.id;
+                                      if (!_routeTargetStoreIds.contains(store.id)) {
+                                          _routeTargetStoreIds.add(store.id);
+                                      }
                                     });
                                     _animateToStore(store);
                                     if (_sheetController.isAttached) {

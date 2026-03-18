@@ -7,13 +7,13 @@ class MarketPainter extends CustomPainter {
   final List<Store> stores;
   final List<POI> pois;
   final String? selectedStoreId;
-  final String? routeTargetStoreId;
+  final List<String> routeTargetStoreIds;
 
   MarketPainter({
     required this.stores,
     required this.pois,
     this.selectedStoreId,
-    this.routeTargetStoreId,
+    this.routeTargetStoreIds = const [],
   });
 
   static const _zones = [
@@ -27,7 +27,7 @@ class MarketPainter extends CustomPainter {
     _drawZones(canvas, size);
     _drawAisles(canvas, size);
     
-    if (routeTargetStoreId != null) {
+    if (routeTargetStoreIds.isNotEmpty) {
       _drawRoute(canvas, size);
     }
     
@@ -242,33 +242,35 @@ class MarketPainter extends CustomPainter {
   }
 
   void _drawRoute(Canvas canvas, Size size) {
-    if (routeTargetStoreId == null) return;
+    if (routeTargetStoreIds.isEmpty) return;
     
-    final targetStore = stores.where((s) => s.id == routeTargetStoreId).firstOrNull;
     final entrance = pois.where((p) => p.type == POIType.entrance).firstOrNull;
-    
-    if (targetStore == null || entrance == null) return;
-
-    final start = Offset(entrance.mapX * size.width, entrance.mapY * size.height);
-    final end = Offset(targetStore.mapX * size.width, targetStore.mapY * size.height);
+    if (entrance == null) return;
 
     final path = Path();
-    path.moveTo(start.dx, start.dy);
+    Offset currentPos = Offset(entrance.mapX * size.width, entrance.mapY * size.height);
+    path.moveTo(currentPos.dx, currentPos.dy);
     
-    // Simple 90-degree routing strategy
-    // Go down main aisle (x=0.5), then horizontally to store, then vertically to exact spot
-    final midY1 = start.dy; 
-    final midX = size.width * 0.5;
-    
-    path.lineTo(midX, midY1); // To center aisle
-    path.lineTo(midX, end.dy); // Down center aisle
-    path.lineTo(end.dx, end.dy); // To store
-
     final paint = Paint()
       ..color = AppColors.primary
       ..style = PaintingStyle.stroke
       ..strokeWidth = 3.0
       ..strokeCap = StrokeCap.round;
+
+    for (final storeId in routeTargetStoreIds) {
+      final targetStore = stores.where((s) => s.id == storeId).firstOrNull;
+      if (targetStore == null) continue;
+
+      final end = Offset(targetStore.mapX * size.width, targetStore.mapY * size.height);
+      
+      // Routing strategy: 90-degree turns via center aisle
+      final midX = size.width * 0.5;
+      path.lineTo(midX, currentPos.dy); 
+      path.lineTo(midX, end.dy);
+      path.lineTo(end.dx, end.dy);
+      
+      currentPos = end;
+    }
 
     // Draw dashed path
     const dashWidth = 8.0;
@@ -286,8 +288,14 @@ class MarketPainter extends CustomPainter {
       distance = 0.0;
     }
     
-    // Draw dot at end
-    canvas.drawCircle(end, 6, Paint()..color = AppColors.primary);
+    // Draw dots at each stop
+    for (final storeId in routeTargetStoreIds) {
+      final s = stores.where((st) => st.id == storeId).firstOrNull;
+      if (s != null) {
+        final p = Offset(s.mapX * size.width, s.mapY * size.height);
+        canvas.drawCircle(p, 6, Paint()..color = AppColors.primary);
+      }
+    }
   }
 
   Store? storeAtPosition(Offset pos, Size size) {
@@ -304,7 +312,7 @@ class MarketPainter extends CustomPainter {
   @override
   bool shouldRepaint(MarketPainter oldDelegate) {
     return oldDelegate.selectedStoreId != selectedStoreId ||
-        oldDelegate.routeTargetStoreId != routeTargetStoreId ||
+        oldDelegate.routeTargetStoreIds.length != routeTargetStoreIds.length ||
         oldDelegate.stores.length != stores.length;
   }
 }

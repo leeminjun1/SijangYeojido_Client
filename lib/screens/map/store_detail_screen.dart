@@ -5,6 +5,8 @@ import '../../data/mock_data.dart';
 import '../../theme/app_colors.dart';
 import '../../widgets/shrinkable_button.dart';
 import '../../widgets/app_ui.dart';
+import '../market/market_info_screen.dart';
+import '../../services/favorite_service.dart';
 
 class StoreDetailScreen extends StatelessWidget {
   final Store store;
@@ -42,20 +44,30 @@ class StoreDetailScreen extends StatelessWidget {
         ),
         actions: [
           Center(
-            child: ShrinkableButton(
-              onTap: () {},
-              child: Padding(
-                padding: const EdgeInsets.only(right: 16),
-                child: Container(
-                  width: 36,
-                  height: 36,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.8),
-                    shape: BoxShape.circle,
+            child: ListenableBuilder(
+              listenable: FavoriteService(),
+              builder: (context, _) {
+                final isFav = FavoriteService().isFavorite(store.id);
+                return ShrinkableButton(
+                  onTap: () => FavoriteService().toggleFavorite(store.id),
+                  child: Padding(
+                    padding: const EdgeInsets.only(right: 16),
+                    child: Container(
+                      width: 36,
+                      height: 36,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.8),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        isFav ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+                        size: 20,
+                        color: isFav ? Colors.redAccent : AppColors.textPrimary,
+                      ),
+                    ),
                   ),
-                  child: const Icon(Icons.favorite_border_rounded, size: 20, color: AppColors.textPrimary),
-                ),
-              ),
+                );
+              },
             ),
           ),
         ],
@@ -289,6 +301,9 @@ class StoreDetailScreen extends StatelessWidget {
                                   }).toList(),
                                 ),
                         ),
+
+                        const SizedBox(height: 16),
+                        _buildRealTimeInsight(context),
                       ],
                     ),
                   ),
@@ -380,10 +395,16 @@ class StoreDetailScreen extends StatelessWidget {
                     const SizedBox(width: 12),
                     Expanded(
                       child: _ActionButton(
-                        icon: Icons.report_gmailerrorred_rounded,
-                        label: '정보 신고',
-                        onTap: () {},
-                        isDestructive: true,
+                        icon: Icons.info_outline_rounded,
+                        label: '시장 정보',
+                        onTap: () {
+                          showModalBottomSheet(
+                            context: context,
+                            isScrollControlled: true,
+                            backgroundColor: Colors.transparent,
+                            builder: (context) => const MarketInfoScreen(),
+                          );
+                        },
                       ),
                     ),
                   ],
@@ -391,6 +412,102 @@ class StoreDetailScreen extends StatelessWidget {
               ],
             ),
           ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRealTimeInsight(BuildContext context) {
+    if (store.freshness == null && store.inventoryStatus == null) return const SizedBox.shrink();
+    
+    final textTheme = Theme.of(context).textTheme;
+    return _SectionCard(
+      title: '실시간 현황 ⚡',
+      child: Column(
+        children: [
+          if (store.freshness != null) ...[
+            Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          const Icon(Icons.verified_rounded, color: Color(0xFF10B981), size: 16),
+                          const SizedBox(width: 6),
+                          Text(
+                            '품질 신선도',
+                            style: textTheme.bodyMedium?.copyWith(
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.textSecondary,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(100),
+                        child: LinearProgressIndicator(
+                          value: store.freshness! / 100,
+                          minHeight: 8,
+                          backgroundColor: AppColors.background,
+                          valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF10B981)),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 24),
+                Text(
+                  '${store.freshness}%',
+                  style: textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.w900,
+                    color: const Color(0xFF10B981),
+                  ),
+                ),
+              ],
+            ),
+          ],
+          if (store.freshness != null && store.inventoryStatus != null)
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 16),
+              child: Divider(height: 1, color: AppColors.divider),
+            ),
+          if (store.inventoryStatus != null)
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    const Icon(Icons.inventory_2_rounded, color: AppColors.primary, size: 16),
+                    const SizedBox(width: 6),
+                    Text(
+                      '재고 상태',
+                      style: textTheme.bodyMedium?.copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                  ],
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: store.inventoryStatus == '품절' ? Colors.red.withValues(alpha: 0.1) : AppColors.primary.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Text(
+                    store.inventoryStatus!,
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w900,
+                      color: store.inventoryStatus == '품절' ? Colors.red : AppColors.primary,
+                    ),
+                  ),
+                ),
+              ],
+            ),
         ],
       ),
     );

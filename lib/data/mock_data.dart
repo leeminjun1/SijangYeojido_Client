@@ -1665,7 +1665,8 @@ class MockData {
     const POI(name: '화장실', type: POIType.toilet, mapX: 0.05, mapY: 0.88),
     const POI(name: 'ATM', type: POIType.atm, mapX: 0.5, mapY: 0.92),
     const POI(name: '주차장', type: POIType.parking, mapX: 0.9, mapY: 0.88),
-    const POI(name: '정문 입구', type: POIType.entrance, mapX: 0.5, mapY: 0.05),
+    const POI(name: '북측 정문', type: POIType.entrance, mapX: 0.5, mapY: 0.05),
+    const POI(name: '남측 입구', type: POIType.entrance, mapX: 0.5, mapY: 0.95),
   ];
 
   static final List<Zone> zones = [

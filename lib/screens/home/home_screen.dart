@@ -6,6 +6,11 @@ import '../../theme/app_colors.dart';
 import '../../widgets/shrinkable_button.dart';
 import 'package:sijangyeojido_client/screens/map/market_hub_screen.dart';
 import '../../widgets/skeleton.dart';
+import '../explore/search_screen.dart';
+import '../../services/favorite_service.dart';
+import '../map/store_detail_screen.dart';
+import '../../services/recommendation_service.dart';
+import '../../widgets/app_card.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -113,36 +118,155 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
 
+          _buildPhase3Logistics(),
+          const SliverToBoxAdapter(child: SizedBox(height: 12)),
+
           // ── Search Bar ─────────────────────────────────────────
           SliverToBoxAdapter(
             child: Container(
               color: AppColors.surface,
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-              child: Container(
-                height: 52,
-                decoration: BoxDecoration(
-                  color: AppColors.background,
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Row(
-                  children: [
-                    const Icon(Icons.search,
-                        color: AppColors.textTertiary, size: 22),
-                    const SizedBox(width: 8),
-                    Text(
-                      '찾으시는 시장이 있나요?',
-                      style: textTheme.bodyMedium?.copyWith(
-                        color: AppColors.textTertiary,
-                        fontWeight: FontWeight.w500,
+              child: ShrinkableButton(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const SearchScreen()),
+                  );
+                },
+                child: Container(
+                  height: 52,
+                  decoration: BoxDecoration(
+                    color: AppColors.background,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.search_rounded,
+                          color: AppColors.primary, size: 22),
+                      const SizedBox(width: 8),
+                      Text(
+                        '가게, 품목, 구역 검색',
+                        style: textTheme.bodyMedium?.copyWith(
+                          color: AppColors.textTertiary,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
           ),
 
+
+          // ── Favorites Section ──────────────────────────────────
+          SliverToBoxAdapter(
+            child: ListenableBuilder(
+              listenable: FavoriteService(),
+              builder: (context, _) {
+                final favIds = FavoriteService().favoriteIds;
+                if (favIds.isEmpty) return const SizedBox.shrink();
+
+                final favStores = MockData.stores
+                    .where((s) => favIds.contains(s.id))
+                    .toList();
+
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(20, 32, 20, 16),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.favorite_rounded,
+                              color: Colors.redAccent, size: 20),
+                          const SizedBox(width: 8),
+                          Text(
+                            '나의 단골집',
+                            style: textTheme.titleLarge?.copyWith(
+                              fontWeight: FontWeight.w900,
+                              color: AppColors.textPrimary,
+                              letterSpacing: -0.5,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(
+                      height: 140,
+                      child: ListView.builder(
+                        padding: const EdgeInsets.symmetric(horizontal: 14),
+                        scrollDirection: Axis.horizontal,
+                        itemCount: favStores.length,
+                        itemBuilder: (context, index) {
+                          final store = favStores[index];
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 6),
+                            child: ShrinkableButton(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => StoreDetailScreen(store: store),
+                                  ),
+                                );
+                              },
+                              child: Container(
+                                width: 140,
+                                decoration: BoxDecoration(
+                                  color: AppColors.surface,
+                                  borderRadius: BorderRadius.circular(24),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withValues(alpha: 0.03),
+                                      blurRadius: 10,
+                                      offset: const Offset(0, 4),
+                                    ),
+                                  ],
+                                ),
+                                padding: const EdgeInsets.all(16),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Container(
+                                      width: 48,
+                                      height: 48,
+                                      decoration: BoxDecoration(
+                                        color: AppColors.background,
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: Icon(
+                                        Icons.storefront_rounded,
+                                        color: AppColors.primary,
+                                        size: 24,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 12),
+                                    Text(
+                                      store.name,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: textTheme.bodyMedium?.copyWith(
+                                        fontWeight: FontWeight.w800,
+                                        color: AppColors.textPrimary,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
+
+          _buildPhase3Recommendations(textTheme),
 
           // ── Market Section ─────────────────────────────────────
           SliverToBoxAdapter(
@@ -421,6 +545,180 @@ class _MarketCard extends StatelessWidget {
               ),
           ],
         ),
+      ),
+    );
+  }
+  Widget _buildPhase3Logistics() {
+    return SliverToBoxAdapter(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        child: ShrinkableButton(
+          onTap: () {},
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            decoration: BoxDecoration(
+              color: AppColors.primary.withValues(alpha: 0.05),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: AppColors.primary.withValues(alpha: 0.1)),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: const BoxDecoration(
+                    color: AppColors.primary,
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.shopping_bag_rounded, color: Colors.white, size: 16),
+                ),
+                const SizedBox(width: 12),
+                const Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '현재 준비 중인 주문이 1건 있어요',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w800,
+                          color: AppColors.textPrimary,
+                        ),
+                      ),
+                      Text(
+                        '할머니빈대떡 • 픽업 대기 중',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const Icon(Icons.chevron_right_rounded, color: AppColors.textTertiary),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPhase3Recommendations(TextTheme textTheme) {
+    return SliverToBoxAdapter(
+      child: ListenableBuilder(
+        listenable: FavoriteService(),
+        builder: (context, _) {
+          final recommended = RecommendationService().getRecommendedStores();
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 32, 20, 16),
+                child: Row(
+                  children: [
+                    const Icon(Icons.auto_awesome_rounded, color: Colors.amber, size: 20),
+                    const SizedBox(width: 8),
+                    Text(
+                      '나만을 위한 스마트 추천',
+                      style: textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.w900,
+                        color: AppColors.textPrimary,
+                        letterSpacing: -0.5,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(
+                height: 180,
+                child: ListView.builder(
+                  padding: const EdgeInsets.symmetric(horizontal: 14),
+                  scrollDirection: Axis.horizontal,
+                  itemCount: recommended.length,
+                  itemBuilder: (context, index) {
+                    final store = recommended[index];
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 6),
+                      child: ShrinkableButton(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => StoreDetailScreen(store: store),
+                            ),
+                          );
+                        },
+                        child: Container(
+                          width: 220,
+                          decoration: BoxDecoration(
+                            color: AppColors.surface,
+                            borderRadius: BorderRadius.circular(24),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.03),
+                                blurRadius: 10,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              ClipRRect(
+                                borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+                                child: Container(
+                                  height: 100,
+                                  width: double.infinity,
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      colors: [
+                                        AppColors.primary.withValues(alpha: 0.2),
+                                        AppColors.primary.withValues(alpha: 0.05),
+                                      ],
+                                    ),
+                                  ),
+                                  child: Center(
+                                    child: Icon(Icons.auto_awesome_rounded, color: AppColors.primary.withValues(alpha: 0.2), size: 40),
+                                  ),
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(12),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      store.name,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: textTheme.titleSmall?.copyWith(
+                                        fontWeight: FontWeight.w800,
+                                        color: AppColors.textPrimary,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      '${store.category} • ${store.zoneId}구역',
+                                      style: textTheme.labelSmall?.copyWith(
+                                        color: AppColors.textSecondary,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }

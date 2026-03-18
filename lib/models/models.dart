@@ -44,6 +44,8 @@ class Store {
   final String? infoSource;
   final double mapX;
   final double mapY;
+  final int? freshness; // 0-100
+  final String? inventoryStatus; // e.g., '여유', '매진임박', '품절'
 
   const Store({
     required this.id,
@@ -58,6 +60,8 @@ class Store {
     this.infoSource,
     required this.mapX,
     required this.mapY,
+    this.freshness,
+    this.inventoryStatus,
   });
 
 
