@@ -41,13 +41,6 @@ class _HomeScreenState extends State<HomeScreen> {
     super.dispose();
   }
 
-  String get _greeting {
-    final hour = DateTime.now().hour;
-    if (hour < 6) return '늦은 밤이에요 🌙';
-    if (hour < 12) return '좋은 아침이에요 ☀️';
-    if (hour < 17) return '좋은 오후예요 👋';
-    return '좋은 저녁이에요 🌆';
-  }
 
 
 
@@ -115,84 +108,85 @@ class _HomeScreenState extends State<HomeScreen> {
               color: AppColors.surface,
               child: Stack(
                 children: [
-                   // Dynamic Narrative Image (V7)
-                   TweenAnimationBuilder<double>(
-                     tween: Tween(begin: 1.1, end: 1.0),
-                     duration: SDS.durationSlow,
-                     curve: SDS.curveEntrance,
-                     builder: (context, scale, child) {
-                       return Transform.scale(
-                         scale: scale,
-                         child: Container(
-                           decoration: const BoxDecoration(
-                             image: DecorationImage(
-                               image: NetworkImage('https://images.unsplash.com/photo-1590301157890-4810ed352733?auto=format&fit=crop&q=80&w=1000'),
-                             ),
-                           ),
-                         ),
-                       );
-                     },
-                   ),
-                   // Sophisticated Gradient Overlay
-                   Container(
-                     decoration: BoxDecoration(
-                       gradient: LinearGradient(
-                         begin: Alignment.topCenter,
-                           end: Alignment.bottomCenter,
-                           colors: [
-                             Colors.black.withValues(alpha: 0.4),
-                             Colors.transparent,
-                             AppColors.surface.withValues(alpha: 0.8),
-                             AppColors.surface,
-                           ],
-                           stops: const [0.0, 0.4, 0.85, 1.0],
-                       ),
-                     ),
-                   ),
-                   // Narrative Content
-                   Positioned(
-                     left: SDS.gutter,
-                     right: SDS.gutter,
-                     bottom: SDS.spaceXL,
-                     child: Column(
-                       crossAxisAlignment: CrossAxisAlignment.start,
-                       children: [
-                         Container(
-                           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                           decoration: SDS.glassDecoration(opacity: 0.2, blur: 8),
-                           child: const Text(
-                             '오늘의 발견 🇰🇷',
-                             style: TextStyle(
-                               fontSize: 12,
-                               fontWeight: FontWeight.w900,
-                               color: Colors.white,
-                               letterSpacing: 1.0,
-                             ),
-                           ),
-                         ),
-                         const SizedBox(height: 16),
-                         Text(
-                           '100년 전통의 맛,\n광장시장이 부릅니다',
-                           style: TextStyle(
-                             fontSize: 34,
-                             fontWeight: FontWeight.w900,
-                             color: AppColors.textPrimary,
-                             letterSpacing: -1.5,
-                             height: 1.1,
-                           ),
-                         ),
-                         const SizedBox(height: SDS.spaceM),
-                         Text(
-                           _greeting,
-                           style: TextStyle(
-                             fontSize: 15,
-                             fontWeight: FontWeight.w700,
-                             color: AppColors.textSecondary,
-                           ),
-                         ),
-                       ],
-                     ),
-                   ),
+                    // Dynamic Narrative Image (V7.1 Platform Branding)
+                    TweenAnimationBuilder<double>(
+                      tween: Tween(begin: 1.1, end: 1.0),
+                      duration: SDS.durationSlow,
+                      curve: SDS.curveEntrance,
+                      builder: (context, scale, child) {
+                        return Transform.scale(
+                          scale: scale,
+                          child: Container(
+                            decoration: const BoxDecoration(
+                              image: DecorationImage(
+                                image: NetworkImage('https://images.unsplash.com/photo-1543007630-9710e4a00a20?auto=format&fit=crop&q=80&w=1500'), // Premium Market Map Aesthetic
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                    // Sophisticated Gradient Overlay
+                    Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              Colors.black.withValues(alpha: 0.5),
+                              Colors.transparent,
+                              AppColors.surface.withValues(alpha: 0.85),
+                              AppColors.surface,
+                            ],
+                            stops: const [0.0, 0.35, 0.8, 1.0],
+                        ),
+                      ),
+                    ),
+                    // Narrative Content
+                    Positioned(
+                      left: SDS.gutter,
+                      right: SDS.gutter,
+                      bottom: SDS.spaceXL,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                            decoration: SDS.glassDecoration(opacity: 0.25, blur: 12),
+                            child: const Text(
+                              '전통과 디지털의 만남 🗺️',
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w900,
+                                color: Colors.white,
+                                letterSpacing: 1.2,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+                          Text(
+                            '전통시장의 새로운 지도,\n시장여지도로 시작하세요',
+                            style: TextStyle(
+                              fontSize: 34,
+                              fontWeight: FontWeight.w900,
+                              color: AppColors.textPrimary,
+                              letterSpacing: -1.8,
+                              height: 1.15,
+                            ),
+                          ),
+                          const SizedBox(height: SDS.spaceL),
+                          Text(
+                            '어느 시장을 찾고 계신가요? 👋',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w800,
+                              color: AppColors.textSecondary,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                 ],
               ),
             ),
