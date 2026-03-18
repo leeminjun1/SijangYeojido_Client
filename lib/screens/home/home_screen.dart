@@ -153,13 +153,13 @@ class _HomeScreenState extends State<HomeScreen> {
                         children: [
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                            decoration: SDS.glassDecoration(opacity: 0.3, blur: 12),
-                            child: const Text(
+                            decoration: SDS.glassDecoration(opacity: 0.5, blur: 16), // Thicker glass for contrast
+                            child: Text(
                               '전통과 디지털의 만남 🗺️',
                               style: TextStyle(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w900,
-                                color: Colors.white,
+                                color: AppColors.textPrimary, // High-contrast dark text on light glass
                                 letterSpacing: 1.2,
                               ),
                             ),
@@ -175,9 +175,9 @@ class _HomeScreenState extends State<HomeScreen> {
                               height: 1.15,
                               shadows: [
                                 Shadow(
-                                  color: Colors.black.withValues(alpha: 0.3),
-                                  blurRadius: 10,
-                                  offset: const Offset(0, 4),
+                                  color: Colors.black.withValues(alpha: 0.6), // Stronger shadow for title
+                                  blurRadius: 15,
+                                  offset: const Offset(0, 6),
                                 ),
                               ],
                             ),
