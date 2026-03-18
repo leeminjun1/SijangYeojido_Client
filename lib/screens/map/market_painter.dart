@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import '../../models/models.dart';
 import '../../theme/app_colors.dart';
@@ -6,20 +7,18 @@ class MarketPainter extends CustomPainter {
   final List<Store> stores;
   final List<POI> pois;
   final String? selectedStoreId;
-  final List<Deal> activeDeals;
+  final String? routeTargetStoreId;
 
   MarketPainter({
     required this.stores,
     required this.pois,
     this.selectedStoreId,
-    required this.activeDeals,
+    this.routeTargetStoreId,
   });
 
   static const _zones = [
-    _ZoneDef('A', 'A구역\n포목/직물', Rect.fromLTRB(0.05, 0.08, 0.9, 0.28), AppColors.zoneA),
-    _ZoneDef('B', 'B구역\n먹거리', Rect.fromLTRB(0.05, 0.32, 0.9, 0.55), AppColors.zoneB),
-    _ZoneDef('C', 'C구역\n생선/해산물', Rect.fromLTRB(0.05, 0.59, 0.48, 0.82), AppColors.zoneC),
-    _ZoneDef('D', 'D구역\n청과/야채', Rect.fromLTRB(0.52, 0.59, 0.9, 0.82), AppColors.zoneD),
+    _ZoneDef('A', 'A구역\n(건어물/농축산)', Rect.fromLTRB(0.1, 0.05, 0.45, 0.95), AppColors.zoneA),
+    _ZoneDef('B', 'B구역\n(먹거리/생선)', Rect.fromLTRB(0.55, 0.05, 0.9, 0.95), AppColors.zoneB),
   ];
 
   @override
@@ -27,6 +26,11 @@ class MarketPainter extends CustomPainter {
     _drawBackground(canvas, size);
     _drawZones(canvas, size);
     _drawAisles(canvas, size);
+    
+    if (routeTargetStoreId != null) {
+      _drawRoute(canvas, size);
+    }
+    
     _drawPOIs(canvas, size);
     _drawStores(canvas, size);
   }
@@ -77,30 +81,23 @@ class MarketPainter extends CustomPainter {
   void _drawAisles(Canvas canvas, Size size) {
     final paint = Paint()..color = AppColors.aisle;
 
-    // Horizontal aisle between A and B
-    final aisleH1 = _scaleRect(const Rect.fromLTRB(0.0, 0.28, 1.0, 0.32), size);
-    canvas.drawRect(aisleH1, paint);
+    // Center main aisle
+    final centerAisle = _scaleRect(const Rect.fromLTRB(0.45, 0.0, 0.55, 1.0), size);
+    canvas.drawRect(centerAisle, paint);
 
-    // Horizontal aisle between B and C/D
-    final aisleH2 = _scaleRect(const Rect.fromLTRB(0.0, 0.55, 1.0, 0.59), size);
-    canvas.drawRect(aisleH2, paint);
+    // Path within A zone
+    final aAisle = _scaleRect(const Rect.fromLTRB(0.24, 0.05, 0.31, 0.95), size);
+    canvas.drawRect(aAisle, paint);
 
-    // Vertical aisle between C and D
-    final aisleV = _scaleRect(const Rect.fromLTRB(0.48, 0.59, 0.52, 0.82), size);
-    canvas.drawRect(aisleV, paint);
-
-    // Outer margins (also aisle color)
-    final topAisle = _scaleRect(const Rect.fromLTRB(0.0, 0.0, 1.0, 0.08), size);
+    // Path within B zone
+    final bAisle = _scaleRect(const Rect.fromLTRB(0.69, 0.05, 0.76, 0.95), size);
+    canvas.drawRect(bAisle, paint);
+    
+    // Top and Bottom connection aisles
+    final topAisle = _scaleRect(const Rect.fromLTRB(0.0, 0.0, 1.0, 0.05), size);
     canvas.drawRect(topAisle, paint);
-
-    final bottomAisle = _scaleRect(const Rect.fromLTRB(0.0, 0.82, 1.0, 1.0), size);
+    final bottomAisle = _scaleRect(const Rect.fromLTRB(0.0, 0.95, 1.0, 1.0), size);
     canvas.drawRect(bottomAisle, paint);
-
-    final leftAisle = _scaleRect(const Rect.fromLTRB(0.0, 0.0, 0.05, 1.0), size);
-    canvas.drawRect(leftAisle, paint);
-
-    final rightAisle = _scaleRect(const Rect.fromLTRB(0.9, 0.0, 1.0, 1.0), size);
-    canvas.drawRect(rightAisle, paint);
   }
 
   void _drawPOIs(Canvas canvas, Size size) {
@@ -119,14 +116,27 @@ class MarketPainter extends CustomPainter {
         ..strokeWidth = 1.5;
       canvas.drawCircle(pos, 14, borderPaint);
 
-      // POI label
+      // Main entrance logic
+      final isEntrance = poi.type == POIType.entrance;
+      final iconStr = isEntrance ? '입구' : _poiEmoji(poi.type);
+
       final labelPainter = TextPainter(
         text: TextSpan(
-          text: _poiEmoji(poi.type),
-          style: const TextStyle(fontSize: 12),
+          text: iconStr,
+          style: TextStyle(
+            fontSize: isEntrance ? 10 : 12,
+            fontWeight: isEntrance ? FontWeight.w800 : FontWeight.w400,
+            color: isEntrance ? Colors.white : AppColors.textPrimary,
+          ),
         ),
         textDirection: TextDirection.ltr,
       );
+      
+      if (isEntrance) {
+        final entPaint = Paint()..color = AppColors.primary;
+        canvas.drawCircle(pos, 14, entPaint);
+      }
+
       labelPainter.layout();
       labelPainter.paint(
         canvas,
@@ -149,24 +159,19 @@ class MarketPainter extends CustomPainter {
   }
 
   void _drawStores(Canvas canvas, Size size) {
-    final activeDealIds = activeDeals.map((d) => d.storeId).toSet();
-
     for (final store in stores) {
       final pos = Offset(store.mapX * size.width, store.mapY * size.height);
       final isSelected = store.id == selectedStoreId;
-      final hasDeal = activeDealIds.contains(store.id);
 
       if (isSelected) {
         // Selection ring
         final selectionPaint = Paint()
-          ..color = AppColors.primaryRed.withValues(alpha:0.25)
+          ..color = AppColors.primary.withValues(alpha:0.25)
           ..style = PaintingStyle.fill;
         canvas.drawCircle(pos, 18, selectionPaint);
       }
 
-      if (hasDeal) {
-        _drawDealPin(canvas, pos, isSelected);
-      } else if (store.status == StoreStatus.open) {
+      if (store.status == StoreStatus.open) {
         _drawOpenPin(canvas, pos, isSelected);
       } else {
         _drawClosedPin(canvas, pos, isSelected);
@@ -178,56 +183,37 @@ class MarketPainter extends CustomPainter {
           text: store.name,
           style: TextStyle(
             fontSize: 9,
-            fontWeight: FontWeight.w600,
-            color: hasDeal ? AppColors.primaryRed : AppColors.textPrimary,
+            fontWeight: FontWeight.w700,
+            color: AppColors.textPrimary,
+            shadows: const [
+              Shadow(
+                blurRadius: 2.0,
+                color: Colors.white,
+                offset: Offset(0, 0),
+              ),
+              Shadow(
+                blurRadius: 4.0,
+                color: Colors.white,
+                offset: Offset(0, 0),
+              ),
+            ],
           ),
         ),
         textDirection: TextDirection.ltr,
       );
-      namePainter.layout(maxWidth: 60);
+      namePainter.layout(maxWidth: 80);
       namePainter.paint(
         canvas,
-        Offset(pos.dx - namePainter.width / 2, pos.dy + 13),
+        Offset(pos.dx - namePainter.width / 2, pos.dy + 14),
       );
     }
   }
 
-  void _drawDealPin(Canvas canvas, Offset pos, bool isSelected) {
-    // Outer red circle
-    final outerPaint = Paint()..color = AppColors.primaryRed;
-    canvas.drawCircle(pos, isSelected ? 13 : 11, outerPaint);
-
-    // White ring
-    final ringPaint = Paint()
-      ..color = Colors.white
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 2;
-    canvas.drawCircle(pos, isSelected ? 13 : 11, ringPaint);
-
-    // Inner white dot
-    final innerPaint = Paint()..color = Colors.white;
-    canvas.drawCircle(pos, 4, innerPaint);
-
-    // Percent sign or deal indicator
-    final textPainter = TextPainter(
-      text: const TextSpan(
-        text: '%',
-        style: TextStyle(
-          fontSize: 7,
-          fontWeight: FontWeight.w900,
-          color: AppColors.primaryRed,
-        ),
-      ),
-      textDirection: TextDirection.ltr,
-    );
-    textPainter.layout();
-    textPainter.paint(
-      canvas,
-      Offset(pos.dx - textPainter.width / 2, pos.dy - textPainter.height / 2),
-    );
-  }
 
   void _drawOpenPin(Canvas canvas, Offset pos, bool isSelected) {
+    final path = Path()..addOval(Rect.fromCircle(center: pos, radius: isSelected ? 11 : 9));
+    canvas.drawShadow(path, Colors.black, 2, true);
+
     final outerPaint = Paint()..color = AppColors.textPrimary;
     canvas.drawCircle(pos, isSelected ? 11 : 9, outerPaint);
 
@@ -236,6 +222,9 @@ class MarketPainter extends CustomPainter {
   }
 
   void _drawClosedPin(Canvas canvas, Offset pos, bool isSelected) {
+    final path = Path()..addOval(Rect.fromCircle(center: pos, radius: isSelected ? 11 : 9));
+    canvas.drawShadow(path, Colors.black, 2, true);
+
     final outerPaint = Paint()..color = AppColors.textTertiary;
     canvas.drawCircle(pos, isSelected ? 11 : 9, outerPaint);
 
@@ -252,6 +241,55 @@ class MarketPainter extends CustomPainter {
     );
   }
 
+  void _drawRoute(Canvas canvas, Size size) {
+    if (routeTargetStoreId == null) return;
+    
+    final targetStore = stores.where((s) => s.id == routeTargetStoreId).firstOrNull;
+    final entrance = pois.where((p) => p.type == POIType.entrance).firstOrNull;
+    
+    if (targetStore == null || entrance == null) return;
+
+    final start = Offset(entrance.mapX * size.width, entrance.mapY * size.height);
+    final end = Offset(targetStore.mapX * size.width, targetStore.mapY * size.height);
+
+    final path = Path();
+    path.moveTo(start.dx, start.dy);
+    
+    // Simple 90-degree routing strategy
+    // Go down main aisle (x=0.5), then horizontally to store, then vertically to exact spot
+    final midY1 = start.dy; 
+    final midX = size.width * 0.5;
+    
+    path.lineTo(midX, midY1); // To center aisle
+    path.lineTo(midX, end.dy); // Down center aisle
+    path.lineTo(end.dx, end.dy); // To store
+
+    final paint = Paint()
+      ..color = AppColors.primary
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 3.0
+      ..strokeCap = StrokeCap.round;
+
+    // Draw dashed path
+    const dashWidth = 8.0;
+    const dashSpace = 6.0;
+    double distance = 0.0;
+    
+    for (PathMetric pathMetric in path.computeMetrics()) {
+      while (distance < pathMetric.length) {
+        canvas.drawPath(
+          pathMetric.extractPath(distance, distance + dashWidth),
+          paint,
+        );
+        distance += dashWidth + dashSpace;
+      }
+      distance = 0.0;
+    }
+    
+    // Draw dot at end
+    canvas.drawCircle(end, 6, Paint()..color = AppColors.primary);
+  }
+
   Store? storeAtPosition(Offset pos, Size size) {
     const hitRadius = 20.0;
     for (final store in stores) {
@@ -266,8 +304,8 @@ class MarketPainter extends CustomPainter {
   @override
   bool shouldRepaint(MarketPainter oldDelegate) {
     return oldDelegate.selectedStoreId != selectedStoreId ||
-        oldDelegate.stores.length != stores.length ||
-        oldDelegate.activeDeals.length != activeDeals.length;
+        oldDelegate.routeTargetStoreId != routeTargetStoreId ||
+        oldDelegate.stores.length != stores.length;
   }
 }
 

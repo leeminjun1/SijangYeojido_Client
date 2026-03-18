@@ -3,7 +3,8 @@ import 'package:intl/intl.dart';
 import '../../models/models.dart';
 import '../../data/mock_data.dart';
 import '../../theme/app_colors.dart';
-import '../deal/deal_detail_screen.dart';
+import '../../widgets/shrinkable_button.dart';
+import '../../widgets/app_ui.dart';
 
 class StoreDetailScreen extends StatelessWidget {
   final Store store;
@@ -11,8 +12,7 @@ class StoreDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final deal =
-        store.activeDealId != null ? MockData.getDealById(store.activeDealId!) : null;
+    final textTheme = Theme.of(context).textTheme;
     final zone = MockData.getZoneById(store.zoneId);
     final daysSinceUpdate = store.lastUpdated != null
         ? DateTime.now().difference(store.lastUpdated!).inDays
@@ -27,24 +27,35 @@ class StoreDetailScreen extends StatelessWidget {
         elevation: 0,
         scrolledUnderElevation: 1,
         surfaceTintColor: AppColors.surface,
-        leading: IconButton(
-          onPressed: () => Navigator.pop(context),
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 18),
-          color: AppColors.textPrimary,
+        leading: Center(
+          child: ShrinkableButton(
+            onTap: () => Navigator.pop(context),
+            child: Container(
+              width: 32,
+              height: 32,
+              decoration: const BoxDecoration(
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(Icons.arrow_back_ios_new_rounded, size: 18),
+            ),
+          ),
         ),
         title: Text(
           store.name,
-          style: const TextStyle(
-            fontSize: 16,
+          style: textTheme.titleLarge?.copyWith(
             fontWeight: FontWeight.w700,
             color: AppColors.textPrimary,
           ),
         ),
         actions: [
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.favorite_border_rounded, size: 22),
-            color: AppColors.textSecondary,
+          Center(
+            child: ShrinkableButton(
+              onTap: () {},
+              child: Padding(
+                padding: const EdgeInsets.only(right: 16),
+                child: const Icon(Icons.favorite_border_rounded, size: 22, color: AppColors.textSecondary),
+              ),
+            ),
           ),
         ],
         bottom: PreferredSize(
@@ -52,172 +63,178 @@ class StoreDetailScreen extends StatelessWidget {
           child: Container(height: 1, color: AppColors.border),
         ),
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Header section
-            Container(
-              color: AppColors.surface,
-              padding: const EdgeInsets.all(20),
+      body: Column(
+        children: [
+          Expanded(
+            child: SingleChildScrollView(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        width: 60,
-                        height: 60,
-                        decoration: BoxDecoration(
-                          color: zone?.color ?? AppColors.divider,
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        alignment: Alignment.center,
-                        child: Text(
-                          store.zoneId,
-                          style: const TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.w800,
-                            color: AppColors.textSecondary,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 14),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              store.name,
-                              style: const TextStyle(
-                                fontSize: 22,
-                                fontWeight: FontWeight.w800,
-                                color: AppColors.textPrimary,
-                                letterSpacing: -0.3,
-                              ),
-                            ),
-                            const SizedBox(height: 3),
-                            Text(
-                              store.category,
-                              style: const TextStyle(
-                                fontSize: 14,
-                                color: AppColors.textSecondary,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+            // Hero (brand-style)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(18),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      AppColors.primary.withValues(alpha: 0.10),
+                      AppColors.accent.withValues(alpha: 0.08),
                     ],
                   ),
-                  const SizedBox(height: 16),
-                  // Badges row
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: [
-                      _StatusBadge(status: store.status),
-                      if (zone != null)
-                        _ZoneBadge(zone: zone),
-                      if (store.hasDeal)
+                  borderRadius: BorderRadius.circular(24),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
                         Container(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 10, vertical: 5),
+                              horizontal: 10, vertical: 6),
                           decoration: BoxDecoration(
-                            color: AppColors.primaryRed,
+                            color: AppColors.surface.withValues(alpha: 0.9),
                             borderRadius: BorderRadius.circular(100),
                           ),
-                          child: const Row(
+                          child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Icon(Icons.local_offer_rounded,
-                                  size: 11, color: Colors.white),
-                              SizedBox(width: 4),
+                              const Icon(Icons.location_on_rounded,
+                                  size: 14, color: AppColors.textSecondary),
+                              const SizedBox(width: 4),
                               Text(
-                                '현재특가',
-                                style: TextStyle(
+                                '${store.zoneId}구역${store.unitNumber != null ? " · ${store.unitNumber}호" : ""}',
+                                style: textTheme.labelLarge?.copyWith(
                                   fontSize: 12,
-                                  fontWeight: FontWeight.w700,
-                                  color: Colors.white,
+                                  fontWeight: FontWeight.w800,
+                                  color: AppColors.textSecondary,
                                 ),
                               ),
                             ],
                           ),
                         ),
-                    ],
-                  ),
-                  // Freshness indicator
-                  if (daysSinceUpdate != null) ...[
+                        const Spacer(),
+                        ShrinkableButton(
+                          onTap: () {},
+                          child: Container(
+                            width: 40,
+                            height: 40,
+                            decoration: BoxDecoration(
+                              color: AppColors.surface.withValues(alpha: 0.9),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(Icons.favorite_border_rounded,
+                                size: 20, color: AppColors.textSecondary),
+                          ),
+                        ),
+                      ],
+                    ),
                     const SizedBox(height: 14),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 8),
-                      decoration: BoxDecoration(
-                        color: isStale
-                            ? const Color(0xFFFFF7ED)
-                            : AppColors.successLight,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            isStale
-                                ? Icons.warning_amber_rounded
-                                : Icons.check_circle_outline_rounded,
-                            size: 14,
-                            color: isStale ? AppColors.orange : AppColors.success,
-                          ),
-                          const SizedBox(width: 6),
-                          Text(
-                            daysSinceUpdate == 0
-                                ? '오늘 업데이트됨'
-                                : daysSinceUpdate == 1
-                                    ? '어제 업데이트됨'
-                                    : '$daysSinceUpdate일 전 업데이트',
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                              color: isStale ? AppColors.orange : AppColors.success,
-                            ),
-                          ),
-                          if (store.infoSource != null) ...[
-                            const SizedBox(width: 6),
-                            Text(
-                              '· ${store.infoSource}',
-                              style: const TextStyle(
-                                fontSize: 11,
-                                color: AppColors.textTertiary,
-                              ),
-                            ),
-                          ],
-                        ],
+                    Text(
+                      store.name,
+                      style: textTheme.displayMedium?.copyWith(
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: -0.8,
+                        height: 1.15,
                       ),
                     ),
+                    const SizedBox(height: 6),
+                    Text(
+                      store.category,
+                      style: textTheme.bodyMedium?.copyWith(
+                        color: AppColors.textSecondary,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: [
+                        _StatusBadge(status: store.status),
+                        if (zone != null) _ZoneBadge(zone: zone),
+                      ],
+                    ),
+                    if (daysSinceUpdate != null) ...[
+                      const SizedBox(height: 12),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: isStale
+                              ? AppColors.warningLight
+                              : AppColors.successLight,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              isStale
+                                  ? Icons.warning_amber_rounded
+                                  : Icons.check_circle_outline_rounded,
+                              size: 14,
+                              color: isStale
+                                  ? AppColors.warning
+                                  : AppColors.success,
+                            ),
+                            const SizedBox(width: 6),
+                            Text(
+                              daysSinceUpdate == 0
+                                  ? '오늘 업데이트됨'
+                                  : daysSinceUpdate == 1
+                                      ? '어제 업데이트됨'
+                                      : '$daysSinceUpdate일 전 업데이트',
+                              style: textTheme.bodySmall?.copyWith(
+                                fontWeight: FontWeight.w700,
+                                color: isStale
+                                    ? AppColors.warning
+                                    : AppColors.success,
+                              ),
+                            ),
+                            if (store.infoSource != null) ...[
+                              const SizedBox(width: 6),
+                              Text(
+                                '· ${store.infoSource}',
+                                style: textTheme.bodySmall?.copyWith(
+                                  color: AppColors.textSecondary,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ],
+                        ),
+                      ),
+                    ],
                   ],
-                ],
+                ),
               ),
             ),
 
             const SizedBox(height: 8),
 
-            // Active deal section
-            if (deal != null) ...[
-              _DealSection(deal: deal, store: store, fmt: fmt),
-              const SizedBox(height: 8),
-            ],
+            const SizedBox(height: 8),
 
             // Payment methods
             _SectionCard(
               title: '결제 수단',
-              child: Row(
-                children: store.paymentMethods.asMap().entries.expand((e) {
-                  return [
-                    if (e.key > 0) const SizedBox(width: 8),
-                    Expanded(child: _PaymentChip(method: e.value)),
-                  ];
-                }).toList(),
-              ),
+              child: store.paymentMethods.isEmpty
+                  ? AppEmptyState(
+                      icon: Icons.payments_outlined,
+                      title: '결제 수단 정보가 없어요',
+                      description: '방문 후 결제 방식을 알려주시면\n더 정확하게 안내할게요',
+                    )
+                  : Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: store.paymentMethods
+                          .map((m) => _PaymentChip(method: m))
+                          .toList(),
+                    ),
             ),
 
             const SizedBox(height: 8),
@@ -225,101 +242,143 @@ class StoreDetailScreen extends StatelessWidget {
             // Items
             _SectionCard(
               title: '대표 상품',
-              child: Column(
-                children: store.items.asMap().entries.map((entry) {
-                  return Column(
-                    children: [
-                      if (entry.key > 0)
-                        const Divider(height: 1, indent: 44),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        child: Row(
+              child: store.items.isEmpty
+                  ? AppEmptyState(
+                      icon: Icons.inventory_2_outlined,
+                      title: '대표 상품이 아직 등록되지 않았어요',
+                      description: '이 가게에서 많이 파는 상품을\n알려주시면 빠르게 반영할게요',
+                    )
+                  : Column(
+                      children: store.items.asMap().entries.map((entry) {
+                        return Column(
                           children: [
-                            Container(
-                              width: 32,
-                              height: 32,
-                              decoration: BoxDecoration(
-                                color: AppColors.divider,
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              alignment: Alignment.center,
-                              child: Text(
-                                '${entry.key + 1}',
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w700,
-                                  color: AppColors.textSecondary,
-                                ),
+                            if (entry.key > 0)
+                              const Divider(height: 1, indent: 44),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    width: 28,
+                                    height: 28,
+                                    decoration: BoxDecoration(
+                                      gradient: LinearGradient(
+                                        colors: [
+                                          AppColors.primary.withValues(alpha: 0.12),
+                                          AppColors.accent.withValues(alpha: 0.08),
+                                        ],
+                                      ),
+                                      shape: BoxShape.circle,
+                                    ),
+                                    alignment: Alignment.center,
+                                    child: Text(
+                                      '${entry.key + 1}',
+                                      style: textTheme.labelSmall?.copyWith(
+                                        fontWeight: FontWeight.w900,
+                                        color: AppColors.primary,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Text(
+                                      entry.value.name,
+                                      style: textTheme.bodyLarge?.copyWith(
+                                        fontWeight: FontWeight.w700,
+                                        color: AppColors.textPrimary,
+                                      ),
+                                    ),
+                                  ),
+                                  if (entry.value.price != null)
+                                    Text(
+                                      '${fmt.format(entry.value.price)}원',
+                                      style: textTheme.bodyLarge?.copyWith(
+                                        fontWeight: FontWeight.w900,
+                                        color: AppColors.textPrimary,
+                                      ),
+                                    ),
+                                ],
                               ),
                             ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Text(
-                                entry.value.name,
-                                style: const TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w500,
-                                  color: AppColors.textPrimary,
-                                ),
-                              ),
-                            ),
-                            if (entry.value.price != null)
-                              Text(
-                                '${fmt.format(entry.value.price)}원',
-                                style: const TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w700,
-                                  color: AppColors.textPrimary,
-                                ),
-                              ),
                           ],
-                        ),
-                      ),
-                    ],
-                  );
-                }).toList(),
-              ),
+                        );
+                      }).toList(),
+                    ),
             ),
 
-            const SizedBox(height: 8),
-
-            // Action buttons
-            Container(
-              color: AppColors.surface,
-              padding: const EdgeInsets.all(20),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: _ActionButton(
-                      icon: Icons.directions_outlined,
-                      label: '길찾기',
-                      onTap: () {},
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: _ActionButton(
-                      icon: Icons.favorite_border_rounded,
-                      label: '즐겨찾기',
-                      onTap: () {},
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: _ActionButton(
-                      icon: Icons.flag_outlined,
-                      label: '정보 신고',
-                      onTap: () {},
-                      isDestructive: true,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 40),
+            const SizedBox(height: 20),
           ],
         ),
+      ),
+    ),
+
+          // Bottom fixed action bar (CTA + secondary actions)
+          Container(
+            padding: EdgeInsets.fromLTRB(
+              16,
+              12,
+              16,
+              MediaQuery.of(context).padding.bottom + 12,
+            ),
+            decoration: BoxDecoration(
+              color: AppColors.surface,
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+              boxShadow: const [
+                BoxShadow(
+                  color: AppColors.cardShadowLight,
+                  blurRadius: 20,
+                  offset: Offset(0, -4),
+                ),
+              ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: AppPrimaryButton(
+                        label: '지도에서 위치 보기',
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                Row(
+                  children: [
+                    Expanded(
+                      child: _ActionButton(
+                        icon: Icons.directions_outlined,
+                        label: '길찾기',
+                        onTap: () {},
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: _ActionButton(
+                        icon: Icons.favorite_border_rounded,
+                        label: '즐겨찾기',
+                        onTap: () {},
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: _ActionButton(
+                        icon: Icons.flag_outlined,
+                        label: '정보 신고',
+                        onTap: () {},
+                        isDestructive: true,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -332,21 +391,34 @@ class _SectionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
     return Container(
-      color: AppColors.surface,
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: const [
+          BoxShadow(
+            color: AppColors.cardShadow,
+            blurRadius: 16,
+            offset: Offset(0, 4),
+            spreadRadius: 0,
+          ),
+        ],
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             title,
-            style: const TextStyle(
-              fontSize: 15,
-              fontWeight: FontWeight.w700,
+            style: textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.w900,
               color: AppColors.textPrimary,
+              letterSpacing: -0.3,
             ),
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: 12),
           child,
         ],
       ),
@@ -354,172 +426,6 @@ class _SectionCard extends StatelessWidget {
   }
 }
 
-class _DealSection extends StatelessWidget {
-  final Deal deal;
-  final Store store;
-  final NumberFormat fmt;
-
-  const _DealSection(
-      {required this.deal, required this.store, required this.fmt});
-
-  @override
-  Widget build(BuildContext context) {
-    final remaining = deal.expiresAt.difference(DateTime.now());
-    final mins = remaining.inMinutes;
-
-    return Container(
-      color: AppColors.surface,
-      padding: const EdgeInsets.all(20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: AppColors.primaryRed,
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                child: const Text(
-                  '현재특가',
-                  style: TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w800,
-                    color: Colors.white,
-                    letterSpacing: 0.3,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Text(
-                  deal.title,
-                  style: const TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.textPrimary,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 14),
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(18),
-            decoration: BoxDecoration(
-              color: AppColors.primaryRedLight,
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(
-                color: AppColors.primaryRed.withValues(alpha: 0.2),
-              ),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Text(
-                      '${fmt.format(deal.dealPrice)}원',
-                      style: const TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.w800,
-                        color: AppColors.primaryRed,
-                        letterSpacing: -0.5,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 4),
-                      child: Text(
-                        '${fmt.format(deal.originalPrice)}원',
-                        style: const TextStyle(
-                          fontSize: 15,
-                          color: AppColors.textTertiary,
-                          decoration: TextDecoration.lineThrough,
-                        ),
-                      ),
-                    ),
-                    const Spacer(),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 5),
-                      decoration: BoxDecoration(
-                        color: AppColors.primaryRed,
-                        borderRadius: BorderRadius.circular(100),
-                      ),
-                      child: Text(
-                        '${deal.discountPercent}% 할인',
-                        style: const TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    const Icon(Icons.access_time_rounded,
-                        size: 14, color: AppColors.orange),
-                    const SizedBox(width: 5),
-                    Text(
-                      mins > 0 ? '$mins분 후 마감' : '곧 마감',
-                      style: const TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.orange,
-                      ),
-                    ),
-                    const SizedBox(width: 14),
-                    const Icon(Icons.inventory_2_outlined,
-                        size: 14, color: AppColors.textTertiary),
-                    const SizedBox(width: 5),
-                    Text(
-                      '${deal.remainingQty}/${deal.totalQty}개 남음',
-                      style: const TextStyle(
-                        fontSize: 13,
-                        color: AppColors.textSecondary,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 14),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) =>
-                              DealDetailScreen(deal: deal, store: store),
-                        ),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      minimumSize: const Size(double.infinity, 46),
-                    ),
-                    child: const Text(
-                      '지금 예약하기',
-                      style: TextStyle(
-                          fontSize: 15, fontWeight: FontWeight.w700),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
 
 class _StatusBadge extends StatelessWidget {
   final StoreStatus status;
@@ -589,25 +495,46 @@ class _PaymentChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
     return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: AppColors.divider,
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: AppColors.border),
+        color: AppColors.background,
+        borderRadius: BorderRadius.circular(100),
       ),
-      alignment: Alignment.center,
-      child: Text(
-        method.label,
-        style: const TextStyle(
-          fontSize: 12,
-          fontWeight: FontWeight.w600,
-          color: AppColors.textSecondary,
-        ),
-        textAlign: TextAlign.center,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            _iconFor(method),
+            size: 16,
+            color: AppColors.textSecondary,
+          ),
+          const SizedBox(width: 6),
+          Text(
+            method.label,
+            style: textTheme.labelLarge?.copyWith(
+              fontSize: 12,
+              fontWeight: FontWeight.w900,
+              color: AppColors.textSecondary,
+            ),
+          ),
+        ],
       ),
     );
+  }
+
+  IconData _iconFor(PaymentMethod m) {
+    switch (m) {
+      case PaymentMethod.cash:
+        return Icons.payments_outlined;
+      case PaymentMethod.card:
+        return Icons.credit_card_outlined;
+      case PaymentMethod.zeroPay:
+        return Icons.qr_code_2_rounded;
+      case PaymentMethod.kakao:
+        return Icons.chat_bubble_outline_rounded;
+    }
   }
 }
 
@@ -628,13 +555,13 @@ class _ActionButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final color =
         isDestructive ? AppColors.textTertiary : AppColors.textSecondary;
-    return GestureDetector(
+    return ShrinkableButton(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 14),
         decoration: BoxDecoration(
-          color: AppColors.divider,
-          borderRadius: BorderRadius.circular(12),
+          color: AppColors.background,
+          borderRadius: BorderRadius.circular(20),
         ),
         child: Column(
           children: [
@@ -644,8 +571,9 @@ class _ActionButton extends StatelessWidget {
               label,
               style: TextStyle(
                 fontSize: 12,
-                fontWeight: FontWeight.w600,
+                fontWeight: FontWeight.w700,
                 color: color,
+                letterSpacing: -0.2,
               ),
             ),
           ],

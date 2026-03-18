@@ -7,6 +7,7 @@ class ProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
     final completedReservations =
         MockData.reservations.where((r) => r.isCompleted).length;
 
@@ -19,10 +20,9 @@ class ProfileScreen extends StatelessWidget {
             backgroundColor: AppColors.background,
             elevation: 0,
             centerTitle: false,
-            title: const Text(
+            title: Text(
               '마이',
-              style: TextStyle(
-                fontSize: 22,
+              style: textTheme.headlineSmall?.copyWith(
                 fontWeight: FontWeight.w800,
                 color: AppColors.textPrimary,
               ),
@@ -38,7 +38,32 @@ class ProfileScreen extends StatelessWidget {
                 _FavoriteMarketsSection(),
                 const SizedBox(height: 8),
                 _SettingsSection(),
-                const SizedBox(height: 32),
+                const SizedBox(height: 24),
+                Center(
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: 32),
+                    child: Column(
+                      children: [
+                        Text(
+                          '\uc2dc\uc7a5\uc5ec\uc9c0\ub3c4',
+                          style: textTheme.bodySmall?.copyWith(
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.textTertiary,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          'v1.0.0',
+                          style: textTheme.bodySmall?.copyWith(
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.textTertiary,
+                            fontSize: 11,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
@@ -51,13 +76,27 @@ class ProfileScreen extends StatelessWidget {
 class _ProfileHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
     return Container(
       margin: const EdgeInsets.fromLTRB(16, 8, 16, 0),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.border),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            AppColors.primary.withValues(alpha: 0.06),
+            AppColors.accent.withValues(alpha: 0.04),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: const [
+          BoxShadow(
+            color: AppColors.cardShadow,
+            blurRadius: 16,
+            offset: Offset(0, 4),
+          ),
+        ],
       ),
       child: Row(
         children: [
@@ -88,19 +127,17 @@ class _ProfileHeader extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   '김시장',
-                  style: TextStyle(
-                    fontSize: 18,
+                  style: textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.w800,
                     color: AppColors.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 3),
-                const Text(
+                Text(
                   '시장 단골 회원',
-                  style: TextStyle(
-                    fontSize: 13,
+                  style: textTheme.bodySmall?.copyWith(
                     color: AppColors.textSecondary,
                   ),
                 ),
@@ -109,7 +146,7 @@ class _ProfileHeader extends StatelessWidget {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
                   decoration: BoxDecoration(
-                    color: AppColors.primaryRedLight,
+                    color: AppColors.primaryLight,
                     borderRadius: BorderRadius.circular(100),
                   ),
                   child: const Text(
@@ -117,7 +154,7 @@ class _ProfileHeader extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w600,
-                      color: AppColors.primaryRed,
+                      color: AppColors.primary,
                     ),
                   ),
                 ),
@@ -170,8 +207,14 @@ class _StatCard extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 16),
         decoration: BoxDecoration(
           color: AppColors.surface,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: AppColors.border),
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: const [
+            BoxShadow(
+              color: AppColors.cardShadowLight,
+              blurRadius: 10,
+              offset: Offset(0, 2),
+            ),
+          ],
         ),
         child: Column(
           children: [
@@ -208,7 +251,6 @@ class _FavoriteMarketsSection extends StatelessWidget {
           name: '광장시장',
           address: '서울 종로구 창경궁로 88',
           storeCount: MockData.stores.length,
-          activeDeals: MockData.deals.length,
         ),
       ],
     );
@@ -219,13 +261,11 @@ class _MarketTile extends StatelessWidget {
   final String name;
   final String address;
   final int storeCount;
-  final int activeDeals;
 
   const _MarketTile({
     required this.name,
     required this.address,
     required this.storeCount,
-    required this.activeDeals,
   });
 
   @override
@@ -236,7 +276,7 @@ class _MarketTile extends StatelessWidget {
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
           color: AppColors.background,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(16),
         ),
         child: Row(
           children: [
@@ -244,11 +284,11 @@ class _MarketTile extends StatelessWidget {
               width: 44,
               height: 44,
               decoration: BoxDecoration(
-                color: AppColors.primaryRedLight,
+                color: AppColors.primaryLight,
                 borderRadius: BorderRadius.circular(10),
               ),
               child: const Icon(Icons.storefront,
-                  color: AppColors.primaryRed, size: 22),
+                  color: AppColors.primary, size: 22),
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -280,28 +320,7 @@ class _MarketTile extends StatelessWidget {
                   style: const TextStyle(
                       fontSize: 12, color: AppColors.textSecondary),
                 ),
-                if (activeDeals > 0)
-                  Row(
-                    children: [
-                      Container(
-                        width: 6,
-                        height: 6,
-                        decoration: const BoxDecoration(
-                          color: AppColors.primaryRed,
-                          shape: BoxShape.circle,
-                        ),
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        '특가 $activeDeals',
-                        style: const TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.primaryRed,
-                        ),
-                      ),
-                    ],
-                  ),
+
               ],
             ),
           ],
@@ -320,7 +339,7 @@ class _SettingsSection extends StatelessWidget {
         _SettingItem(
           icon: Icons.notifications_outlined,
           label: '알림 설정',
-          subtitle: '특가 푸시, 야간 제한',
+          subtitle: '푸시 알림, 야간 제한',
           onTap: () {},
         ),
         _SettingItem(
@@ -431,8 +450,14 @@ class _Section extends StatelessWidget {
           margin: const EdgeInsets.symmetric(horizontal: 16),
           decoration: BoxDecoration(
             color: AppColors.surface,
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: AppColors.border),
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: const [
+              BoxShadow(
+                color: AppColors.cardShadow,
+                blurRadius: 16,
+                offset: Offset(0, 4),
+              ),
+            ],
           ),
           child: Column(children: children),
         ),

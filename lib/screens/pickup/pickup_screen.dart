@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../models/models.dart';
 import '../../theme/app_colors.dart';
+import '../../widgets/app_ui.dart';
 
 class PickupScreen extends StatefulWidget {
   final Reservation reservation;
@@ -80,7 +81,7 @@ class _PickupScreenState extends State<PickupScreen> {
             },
             child: const Text(
               '취소하기',
-              style: TextStyle(color: AppColors.primaryRed),
+              style: TextStyle(color: AppColors.primary),
             ),
           ),
         ],
@@ -90,6 +91,7 @@ class _PickupScreenState extends State<PickupScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
     final isExpired = _remaining == Duration.zero;
 
     return Scaffold(
@@ -97,7 +99,10 @@ class _PickupScreenState extends State<PickupScreen> {
       appBar: AppBar(
         backgroundColor: AppColors.surface,
         automaticallyImplyLeading: false,
-        title: const Text('픽업 코드'),
+        title: Text(
+          '픽업 코드',
+          style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.close),
@@ -109,38 +114,74 @@ class _PickupScreenState extends State<PickupScreen> {
           child: Container(height: 1, color: AppColors.border),
         ),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          children: [
+      body: Column(
+        children: [
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                children: [
             const SizedBox(height: 8),
 
-            // Status banner
+            // Hero banner
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+              padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: isExpired ? AppColors.divider : AppColors.successLight,
-                borderRadius: BorderRadius.circular(10),
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: isExpired
+                      ? [
+                          AppColors.divider,
+                          AppColors.background,
+                        ]
+                      : [
+                          AppColors.primary.withValues(alpha: 0.14),
+                          AppColors.accent.withValues(alpha: 0.12),
+                        ],
+                ),
+                borderRadius: BorderRadius.circular(24),
               ),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(
-                    isExpired
-                        ? Icons.warning_amber_rounded
-                        : Icons.check_circle_outline,
-                    size: 16,
-                    color: isExpired ? AppColors.textTertiary : AppColors.success,
+                  Container(
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(
+                      color: AppColors.surface.withValues(alpha: 0.9),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      isExpired
+                          ? Icons.warning_amber_rounded
+                          : Icons.check_circle_outline_rounded,
+                      color: isExpired ? AppColors.textTertiary : AppColors.primary,
+                    ),
                   ),
-                  const SizedBox(width: 6),
-                  Text(
-                    isExpired ? '픽업 코드가 만료되었습니다' : '픽업 완료 후 자동으로 닫힙니다',
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w500,
-                      color:
-                          isExpired ? AppColors.textTertiary : AppColors.success,
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          isExpired ? '픽업 코드가 만료되었습니다' : '픽업 준비 완료',
+                          style: textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w800,
+                            color: AppColors.textPrimary,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          isExpired
+                              ? '예약이 만료되어 사용할 수 없어요'
+                              : '점포에서 코드를 보여주면 픽업이 완료돼요',
+                          style: textTheme.bodySmall?.copyWith(
+                            color: AppColors.textSecondary,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
@@ -164,7 +205,7 @@ class _PickupScreenState extends State<PickupScreen> {
                       strokeWidth: 8,
                       backgroundColor: AppColors.border,
                       valueColor: AlwaysStoppedAnimation<Color>(
-                        isExpired ? AppColors.textTertiary : AppColors.primaryRed,
+                        isExpired ? AppColors.textTertiary : AppColors.primary,
                       ),
                     ),
                   ),
@@ -178,7 +219,7 @@ class _PickupScreenState extends State<PickupScreen> {
                           fontWeight: FontWeight.w800,
                           color: isExpired
                               ? AppColors.textTertiary
-                              : AppColors.primaryRed,
+                              : AppColors.primary,
                           fontFeatures: const [FontFeature.tabularFigures()],
                         ),
                       ),
@@ -199,12 +240,11 @@ class _PickupScreenState extends State<PickupScreen> {
             const SizedBox(height: 32),
 
             // Pickup code
-            const Text(
+            Text(
               '픽업 코드',
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
+              style: textTheme.labelLarge?.copyWith(
                 color: AppColors.textSecondary,
+                fontWeight: FontWeight.w700,
               ),
             ),
             const SizedBox(height: 12),
@@ -216,14 +256,14 @@ class _PickupScreenState extends State<PickupScreen> {
                 border: Border.all(
                   color: isExpired
                       ? AppColors.border
-                      : AppColors.primaryRed.withValues(alpha: 0.4),
+                      : AppColors.primary.withValues(alpha: 0.4),
                   width: 2,
                 ),
                 boxShadow: isExpired
                     ? null
                     : [
                         BoxShadow(
-                          color: AppColors.primaryRed.withValues(alpha: 0.1),
+                          color: AppColors.primary.withValues(alpha: 0.1),
                           blurRadius: 16,
                           offset: const Offset(0, 4),
                         ),
@@ -236,7 +276,7 @@ class _PickupScreenState extends State<PickupScreen> {
                   fontWeight: FontWeight.w900,
                   color: isExpired
                       ? AppColors.textTertiary
-                      : AppColors.primaryRed,
+                      : AppColors.primary,
                   letterSpacing: 12,
                   fontFeatures: const [FontFeature.tabularFigures()],
                 ),
@@ -251,7 +291,7 @@ class _PickupScreenState extends State<PickupScreen> {
               height: 160,
               decoration: BoxDecoration(
                 color: AppColors.surface,
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(16),
                 border: Border.all(color: AppColors.border, width: 1.5),
               ),
               child: Column(
@@ -279,29 +319,22 @@ class _PickupScreenState extends State<PickupScreen> {
             const SizedBox(height: 32),
 
             // Store info
-            Container(
-              width: double.infinity,
+            AppCard(
               padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: AppColors.surface,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: AppColors.border),
-              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                  Text(
                     '예약 정보',
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
+                    style: textTheme.labelLarge?.copyWith(
                       color: AppColors.textSecondary,
+                      fontWeight: FontWeight.w700,
                     ),
                   ),
                   const SizedBox(height: 12),
                   _InfoRow(label: '점포명', value: widget.reservation.storeName),
                   const SizedBox(height: 8),
-                  _InfoRow(label: '상품', value: widget.reservation.dealTitle),
+                  _InfoRow(label: '상품', value: widget.reservation.itemName),
                   const SizedBox(height: 8),
                   _InfoRow(
                     label: '수량',
@@ -317,26 +350,57 @@ class _PickupScreenState extends State<PickupScreen> {
               ),
             ),
 
-            const SizedBox(height: 24),
-
-            // Cancel button
-            GestureDetector(
-              onTap: isExpired ? null : _onCancel,
-              child: Text(
-                '예약 취소하기',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: isExpired ? AppColors.textTertiary : AppColors.primaryRed,
-                  decoration: TextDecoration.underline,
-                  decorationColor:
-                      isExpired ? AppColors.textTertiary : AppColors.primaryRed,
-                ),
+                  const SizedBox(height: 24),
+                ],
               ),
             ),
+          ),
 
-            const SizedBox(height: 32),
-          ],
-        ),
+          // Bottom fixed actions
+          Container(
+            padding: EdgeInsets.fromLTRB(
+              16,
+              12,
+              16,
+              MediaQuery.of(context).padding.bottom + 12,
+            ),
+            decoration: BoxDecoration(
+              color: AppColors.surface,
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+              boxShadow: const [
+                BoxShadow(
+                  color: AppColors.cardShadowLight,
+                  blurRadius: 20,
+                  offset: Offset(0, -4),
+                ),
+              ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                AppPrimaryButton(
+                  label: isExpired ? '닫기' : '픽업 완료했어요',
+                  onPressed: () => Navigator.pop(context),
+                ),
+                const SizedBox(height: 10),
+                GestureDetector(
+                  onTap: isExpired ? null : _onCancel,
+                  child: Text(
+                    '예약 취소하기',
+                    style: textTheme.bodyMedium?.copyWith(
+                      fontWeight: FontWeight.w700,
+                      color:
+                          isExpired ? AppColors.textTertiary : AppColors.danger,
+                      decoration: TextDecoration.underline,
+                      decorationColor:
+                          isExpired ? AppColors.textTertiary : AppColors.danger,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

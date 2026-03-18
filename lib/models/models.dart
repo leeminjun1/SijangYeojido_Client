@@ -4,19 +4,19 @@ enum StoreStatus { open, closed, unknown }
 
 enum PaymentMethod { cash, card, zeroPay, kakao }
 
-enum DealStatus { live, expired, soldOut }
-
 enum POIType { toilet, parking, atm, entrance }
 
 class Zone {
   final String id;
   final String name;
+  final String? unitNumber;
   final String description;
   final Color color;
 
   const Zone({
     required this.id,
     required this.name,
+    this.unitNumber,
     required this.description,
     required this.color,
   });
@@ -24,14 +24,17 @@ class Zone {
 
 class StoreItem {
   final String name;
+  final String? unitNumber;
   final int? price;
 
-  const StoreItem({required this.name, this.price});
+  const StoreItem({required this.name,
+    this.unitNumber, this.price});
 }
 
 class Store {
   final String id;
   final String name;
+  final String? unitNumber;
   final String zoneId;
   final String category;
   final StoreStatus status;
@@ -41,11 +44,11 @@ class Store {
   final String? infoSource;
   final double mapX;
   final double mapY;
-  final String? activeDealId;
 
   const Store({
     required this.id,
     required this.name,
+    this.unitNumber,
     required this.zoneId,
     required this.category,
     required this.status,
@@ -55,50 +58,23 @@ class Store {
     this.infoSource,
     required this.mapX,
     required this.mapY,
-    this.activeDealId,
   });
 
-  bool get hasDeal => activeDealId != null;
+
 }
 
-class Deal {
-  final String id;
-  final String storeId;
-  final String title;
-  final String description;
-  final int originalPrice;
-  final int dealPrice;
-  final int totalQty;
-  final int remainingQty;
-  final DateTime expiresAt;
-  final DealStatus status;
 
-  const Deal({
-    required this.id,
-    required this.storeId,
-    required this.title,
-    required this.description,
-    required this.originalPrice,
-    required this.dealPrice,
-    required this.totalQty,
-    required this.remainingQty,
-    required this.expiresAt,
-    required this.status,
-  });
-
-  double get discountRate => (originalPrice - dealPrice) / originalPrice;
-
-  int get discountPercent => (discountRate * 100).round();
-}
 
 class POI {
   final String name;
+  final String? unitNumber;
   final POIType type;
   final double mapX;
   final double mapY;
 
   const POI({
     required this.name,
+    this.unitNumber,
     required this.type,
     required this.mapX,
     required this.mapY,
@@ -108,6 +84,7 @@ class POI {
 class Market {
   final String id;
   final String name;
+  final String? unitNumber;
   final String address;
   final List<Zone> zones;
   final List<Store> stores;
@@ -116,6 +93,7 @@ class Market {
   const Market({
     required this.id,
     required this.name,
+    this.unitNumber,
     required this.address,
     required this.zones,
     required this.stores,
@@ -125,9 +103,8 @@ class Market {
 
 class Reservation {
   final String id;
-  final String dealId;
-  final String dealTitle;
   final String storeName;
+  final String itemName;
   final int quantity;
   final int totalAmount;
   final DateTime reservedAt;
@@ -137,9 +114,8 @@ class Reservation {
 
   const Reservation({
     required this.id,
-    required this.dealId,
-    required this.dealTitle,
     required this.storeName,
+    required this.itemName,
     required this.quantity,
     required this.totalAmount,
     required this.reservedAt,

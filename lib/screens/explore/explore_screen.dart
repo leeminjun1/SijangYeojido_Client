@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+
 import '../../theme/app_colors.dart';
 import '../../models/models.dart';
 import '../../data/mock_data.dart';
-import '../deal/deal_detail_screen.dart';
+
 import '../map/store_bottom_sheet.dart';
 
 class ExploreScreen extends StatefulWidget {
@@ -36,8 +36,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
     return stores;
   }
 
-  List<Deal> get _activeDeals =>
-      MockData.deals.where((d) => d.status == DealStatus.live).toList();
+
 
   @override
   void dispose() {
@@ -54,9 +53,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
           _buildAppBar(),
           _buildSearchBar(),
           _buildCategoryChips(),
-          if (_searchQuery.isEmpty) ...[
-            _buildDealsSection(),
-          ],
+
           _buildStoresSection(),
         ],
       ),
@@ -147,10 +144,10 @@ class _ExploreScreenState extends State<ExploreScreen> {
                   duration: const Duration(milliseconds: 150),
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   decoration: BoxDecoration(
-                    color: selected ? AppColors.primaryRed : AppColors.surface,
+                    color: selected ? AppColors.primary : AppColors.surface,
                     borderRadius: BorderRadius.circular(100),
                     border: Border.all(
-                      color: selected ? AppColors.primaryRed : AppColors.border,
+                      color: selected ? AppColors.primary : AppColors.border,
                     ),
                   ),
                   child: Text(
@@ -170,71 +167,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
     );
   }
 
-  Widget _buildDealsSection() {
-    final deals = _activeDeals;
-    if (deals.isEmpty) return const SliverToBoxAdapter(child: SizedBox.shrink());
 
-    return SliverToBoxAdapter(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 24, 16, 12),
-            child: Row(
-              children: [
-                Container(
-                  width: 8,
-                  height: 8,
-                  decoration: const BoxDecoration(
-                    color: AppColors.primaryRed,
-                    shape: BoxShape.circle,
-                  ),
-                ),
-                const SizedBox(width: 8),
-                const Text(
-                  '지금 특가',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w800,
-                    color: AppColors.textPrimary,
-                  ),
-                ),
-                const SizedBox(width: 6),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                  decoration: BoxDecoration(
-                    color: AppColors.primaryRedLight,
-                    borderRadius: BorderRadius.circular(100),
-                  ),
-                  child: Text(
-                    '${deals.length}',
-                    style: const TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.primaryRed,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          SizedBox(
-            height: 180,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              itemCount: deals.length,
-              itemBuilder: (context, i) => _DealCard(
-                deal: deals[i],
-                store: MockData.getStoreById(deals[i].storeId),
-                onTap: () => _openDeal(deals[i]),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 
   Widget _buildStoresSection() {
     final stores = _filteredStores;
@@ -291,9 +224,6 @@ class _ExploreScreenState extends State<ExploreScreen> {
           final store = stores[index - 1];
           return _StoreListItem(
             store: store,
-            deal: store.activeDealId != null
-                ? MockData.getDealById(store.activeDealId!)
-                : null,
             onTap: () => _openStore(store),
           );
         },
@@ -302,166 +232,20 @@ class _ExploreScreenState extends State<ExploreScreen> {
     );
   }
 
-  void _openDeal(Deal deal) {
-    final store = MockData.getStoreById(deal.storeId);
-    if (store == null) return;
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => DealDetailScreen(deal: deal, store: store),
-      ),
-    );
-  }
+
 
   void _openStore(Store store) {
     StoreBottomSheet.show(context, store);
   }
 }
 
-class _DealCard extends StatelessWidget {
-  final Deal deal;
-  final Store? store;
-  final VoidCallback onTap;
 
-  const _DealCard({required this.deal, required this.store, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    final fmt = NumberFormat('#,###');
-    final remaining = deal.expiresAt.difference(DateTime.now());
-    final mins = remaining.inMinutes;
-
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: 200,
-        margin: const EdgeInsets.only(right: 12),
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: AppColors.surface,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: AppColors.border),
-          boxShadow: const [
-            BoxShadow(
-              color: Color(0x08000000),
-              blurRadius: 8,
-              offset: Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                  decoration: BoxDecoration(
-                    color: AppColors.primaryRedLight,
-                    borderRadius: BorderRadius.circular(100),
-                  ),
-                  child: Text(
-                    '-${deal.discountPercent}%',
-                    style: const TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.primaryRed,
-                    ),
-                  ),
-                ),
-                const Spacer(),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                  decoration: BoxDecoration(
-                    color: AppColors.background,
-                    borderRadius: BorderRadius.circular(100),
-                  ),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.timer_outlined,
-                          size: 11, color: AppColors.textTertiary),
-                      const SizedBox(width: 3),
-                      Text(
-                        '$mins분',
-                        style: const TextStyle(
-                          fontSize: 11,
-                          color: AppColors.textTertiary,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            Text(
-              deal.title,
-              style: const TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.w700,
-                color: AppColors.textPrimary,
-              ),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            ),
-            const SizedBox(height: 4),
-            Text(
-              store?.name ?? '',
-              style: const TextStyle(
-                fontSize: 12,
-                color: AppColors.textTertiary,
-              ),
-            ),
-            const Spacer(),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Text(
-                  '${fmt.format(deal.dealPrice)}원',
-                  style: const TextStyle(
-                    fontSize: 17,
-                    fontWeight: FontWeight.w800,
-                    color: AppColors.primaryRed,
-                  ),
-                ),
-                const SizedBox(width: 6),
-                Text(
-                  '${fmt.format(deal.originalPrice)}원',
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: AppColors.textTertiary,
-                    decoration: TextDecoration.lineThrough,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            LinearProgressIndicator(
-              value: deal.remainingQty / deal.totalQty,
-              backgroundColor: AppColors.border,
-              valueColor: const AlwaysStoppedAnimation<Color>(AppColors.primaryRed),
-              borderRadius: BorderRadius.circular(4),
-              minHeight: 4,
-            ),
-            const SizedBox(height: 4),
-            Text(
-              '${deal.remainingQty}개 남음',
-              style: const TextStyle(fontSize: 11, color: AppColors.textTertiary),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
 
 class _StoreListItem extends StatelessWidget {
   final Store store;
-  final Deal? deal;
   final VoidCallback onTap;
 
-  const _StoreListItem({required this.store, required this.deal, required this.onTap});
+  const _StoreListItem({required this.store, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -474,8 +258,8 @@ class _StoreListItem extends StatelessWidget {
           color: AppColors.surface,
           borderRadius: BorderRadius.circular(14),
           border: Border.all(
-            color: store.hasDeal ? AppColors.primaryRedLight : AppColors.border,
-            width: store.hasDeal ? 1.5 : 1,
+            color: AppColors.border,
+            width: 1,
           ),
           boxShadow: const [
             BoxShadow(
@@ -540,20 +324,7 @@ class _StoreListItem extends StatelessWidget {
                     ],
                   ),
                 ),
-                if (store.hasDeal)
-                  Container(
-                    width: 36,
-                    height: 36,
-                    decoration: const BoxDecoration(
-                      color: AppColors.primaryRedLight,
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      Icons.local_offer,
-                      color: AppColors.primaryRed,
-                      size: 18,
-                    ),
-                  ),
+
               ],
             ),
             if (store.items.isNotEmpty) ...[
@@ -574,40 +345,7 @@ class _StoreListItem extends StatelessWidget {
                 }).toList(),
               ),
             ],
-            if (deal != null) ...[
-              const SizedBox(height: 10),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                decoration: BoxDecoration(
-                  color: AppColors.primaryRedLight,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Row(
-                  children: [
-                    const Icon(Icons.bolt, color: AppColors.primaryRed, size: 16),
-                    const SizedBox(width: 4),
-                    Expanded(
-                      child: Text(
-                        deal!.title,
-                        style: const TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.primaryRed,
-                        ),
-                      ),
-                    ),
-                    Text(
-                      '${NumberFormat('#,###').format(deal!.dealPrice)}원',
-                      style: const TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w800,
-                        color: AppColors.primaryRed,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
+
           ],
         ),
       ),
