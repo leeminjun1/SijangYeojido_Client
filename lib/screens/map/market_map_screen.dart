@@ -247,115 +247,59 @@ class _MarketMapScreenState extends State<MarketMapScreen> with SingleTickerProv
                           onTap: () => Navigator.pop(context),
                           child: Container(
                             height: 52,
+                            width: 52,
                             decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(16),
-                              boxShadow: const [
+                              color: AppColors.surface,
+                              shape: BoxShape.circle,
+                              boxShadow: [
                                 BoxShadow(
-                                  color: Color(0x0A000000),
-                                  blurRadius: 12,
-                                  offset: Offset(0, 4),
+                                  color: Colors.black.withValues(alpha: 0.1),
+                                  blurRadius: 20,
+                                  offset: const Offset(0, 4),
                                 ),
                               ],
+                              border: Border.all(color: AppColors.border),
                             ),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(16),
-                              child: BackdropFilter(
-                                filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                                  decoration: BoxDecoration(
-                                    color: AppColors.surface.withValues(alpha: 0.9),
-                                    border: Border.all(color: AppColors.border),
-                                    borderRadius: BorderRadius.circular(16),
-                                  ),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      const Icon(
-                                        Icons.arrow_back_ios_new_rounded,
-                                        size: 18,
-                                        color: AppColors.textPrimary,
-                                      ),
-                                      const SizedBox(width: 8),
-                                      Text(
-                                        widget.marketName,
-                                        style: textTheme.bodyMedium?.copyWith(
-                                          fontWeight: FontWeight.w800,
-                                          color: AppColors.textPrimary,
-                                          letterSpacing: -0.3,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
+                            child: const Icon(Icons.arrow_back_rounded,
+                                color: AppColors.textPrimary, size: 24),
                           ),
                         ),
                         const SizedBox(width: 8),
-                        // Search field
                         Expanded(
                           child: Container(
                             height: 52,
                             decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(16),
-                              boxShadow: const [
+                              color: AppColors.surface,
+                              borderRadius: BorderRadius.circular(26),
+                              boxShadow: [
                                 BoxShadow(
-                                  color: Color(0x14000000),
-                                  blurRadius: 16,
-                                  offset: Offset(0, 4),
+                                  color: Colors.black.withValues(alpha: 0.08),
+                                  blurRadius: 20,
+                                  offset: const Offset(0, 4),
                                 ),
                               ],
+                              border: Border.all(color: AppColors.border),
                             ),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(16),
-                              child: BackdropFilter(
-                                filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    color: AppColors.surface.withValues(alpha: 0.92),
-                                    border: Border.all(color: AppColors.border),
-                                    borderRadius: BorderRadius.circular(16),
-                                  ),
-                                  child: TextField(
-                                    controller: _searchController,
-                                    onChanged: (v) => setState(() => _searchQuery = v),
-                                    style: textTheme.bodyMedium?.copyWith(
-                                      color: AppColors.textPrimary,
-                                    ),
-                                    decoration: InputDecoration(
-                                      hintText: '${widget.marketName} 점포 검색',
-                                      hintStyle: textTheme.bodyMedium?.copyWith(
-                                        color: AppColors.textTertiary,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                      prefixIcon: const Icon(
-                                        Icons.search_rounded,
-                                        size: 22,
-                                        color: AppColors.textTertiary,
-                                      ),
-                                      suffixIcon: _searchQuery.isNotEmpty
-                                          ? ShrinkableButton(
-                                              onTap: () {
-                                                _searchController.clear();
-                                                setState(() => _searchQuery = '');
-                                              },
-                                              child: const Icon(
-                                                Icons.close_rounded,
-                                                size: 20,
-                                                color: AppColors.textTertiary,
-                                              ),
-                                            )
-                                          : null,
-                                      border: InputBorder.none,
-                                      enabledBorder: InputBorder.none,
-                                      focusedBorder: InputBorder.none,
-                                      filled: false,
-                                      contentPadding: const EdgeInsets.symmetric(
-                                          horizontal: 16, vertical: 0),
-                                    ),
-                                  ),
+                            child: TextField(
+                              controller: _searchController,
+                              onChanged: (v) => setState(() => _searchQuery = v),
+                              style: textTheme.bodyMedium?.copyWith(
+                                color: AppColors.textPrimary,
+                                fontWeight: FontWeight.w700,
+                              ),
+                              decoration: InputDecoration(
+                                hintText: '${widget.marketName} 점포 검색',
+                                hintStyle: textTheme.bodyMedium?.copyWith(
+                                  color: AppColors.textTertiary,
+                                  fontWeight: FontWeight.w600,
                                 ),
+                                prefixIcon: const Icon(
+                                  Icons.search_rounded,
+                                  size: 22,
+                                  color: AppColors.primary,
+                                ),
+                                border: InputBorder.none,
+                                contentPadding: const EdgeInsets.symmetric(vertical: 14),
                               ),
                             ),
                           ),
@@ -661,31 +605,37 @@ class _CategoryChip extends StatelessWidget {
     return ShrinkableButton(
       onTap: onTap,
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 150),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         decoration: BoxDecoration(
           color: isSelected ? AppColors.primary : AppColors.surface,
           borderRadius: BorderRadius.circular(100),
-          border: isSelected ? Border.all(
-            color: AppColors.primary,
+          border: Border.all(
+            color: isSelected ? AppColors.primary : AppColors.border,
             width: 1.2,
-          ) : null,
+          ),
           boxShadow: [
-            if (!isSelected)
-              const BoxShadow(
-                color: AppColors.cardShadowLight,
+            if (isSelected)
+              BoxShadow(
+                color: AppColors.primary.withValues(alpha: 0.2),
+                blurRadius: 12,
+                offset: const Offset(0, 4),
+              )
+            else
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.04),
                 blurRadius: 8,
-                offset: Offset(0, 2),
+                offset: const Offset(0, 2),
               ),
           ],
         ),
         child: Text(
           label,
           style: textTheme.labelLarge?.copyWith(
-            fontSize: 13,
+            fontSize: 14,
             fontWeight: isSelected ? FontWeight.w900 : FontWeight.w700,
-            color: isSelected ? Colors.white : AppColors.textSecondary,
-            letterSpacing: -0.2,
+            color: isSelected ? Colors.white : AppColors.textPrimary,
+            letterSpacing: -0.4,
           ),
         ),
       ),
@@ -821,56 +771,49 @@ class _StoreResultCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
-    final subtitle = '${store.zoneId}구역${store.unitNumber != null ? " · ${store.unitNumber}호" : ""} · ${store.category}';
+    final subtitle = '${store.zoneId}구역${store.unitNumber != null ? " · ${store.unitNumber}호" : ""}';
 
     return ShrinkableButton(
       onTap: onTap,
       shrinkScale: 0.98,
       child: Container(
-        padding: const EdgeInsets.all(14),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         decoration: BoxDecoration(
-          gradient: isSelected
-              ? LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    AppColors.primary.withValues(alpha: 0.14),
-                    AppColors.accent.withValues(alpha: 0.10),
-                  ],
-                )
-              : null,
-          color: isSelected ? null : AppColors.surface,
-          borderRadius: BorderRadius.circular(18),
-          boxShadow: [
-            if (!isSelected)
-              const BoxShadow(
-                color: AppColors.cardShadow,
-                blurRadius: 12,
-                offset: Offset(0, 3),
-              ),
-          ],
+          color: isSelected ? AppColors.primary.withValues(alpha: 0.04) : AppColors.surface,
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(
+            color: isSelected ? AppColors.primary.withValues(alpha: 0.2) : AppColors.border.withValues(alpha: 0.5),
+            width: 1.2,
+          ),
         ),
         child: Row(
           children: [
             Container(
-              width: 44,
-              height: 44,
+              width: 52,
+              height: 52,
               decoration: BoxDecoration(
-                color: AppColors.primaryLight,
-                shape: BoxShape.circle,
-                border: Border.all(color: AppColors.border),
+                color: isSelected ? AppColors.primary : AppColors.background,
+                borderRadius: BorderRadius.circular(18),
+                boxShadow: [
+                  if (isSelected)
+                    BoxShadow(
+                      color: AppColors.primary.withValues(alpha: 0.3),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                ],
               ),
               child: Center(
                 child: Text(
                   store.name.isNotEmpty ? store.name.characters.first : '가',
-                  style: textTheme.titleMedium?.copyWith(
+                  style: textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.w900,
-                    color: AppColors.primary,
+                    color: isSelected ? Colors.white : AppColors.primary,
                   ),
                 ),
               ),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: 16),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -884,55 +827,43 @@ class _StoreResultCard extends StatelessWidget {
                           overflow: TextOverflow.ellipsis,
                           style: textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.w900,
-                            letterSpacing: -0.3,
+                            letterSpacing: -0.8,
                             color: AppColors.textPrimary,
                           ),
                         ),
                       ),
                       const SizedBox(width: 8),
                       _MiniStatusChip(status: store.status),
-
                     ],
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    subtitle,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: textTheme.bodySmall?.copyWith(
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.textSecondary,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Wrap(
-                    spacing: 6,
-                    runSpacing: 6,
-                    children: store.paymentMethods.take(3).map((pm) {
-                      return Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 6),
-                        decoration: BoxDecoration(
-                          color: AppColors.background,
-                          borderRadius: BorderRadius.circular(100),
+                  const SizedBox(height: 6),
+                  Row(
+                    children: [
+                      Text(
+                        subtitle,
+                        style: textTheme.bodySmall?.copyWith(
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.textSecondary,
                         ),
-                        child: Text(
-                          pm.label,
-                          style: textTheme.labelLarge?.copyWith(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w800,
-                            color: AppColors.textSecondary,
-                          ),
+                      ),
+                      const SizedBox(width: 6),
+                      Container(width: 2, height: 2, decoration: const BoxDecoration(color: AppColors.textTertiary, shape: BoxShape.circle)),
+                      const SizedBox(width: 6),
+                      Text(
+                        store.category,
+                        style: textTheme.bodySmall?.copyWith(
+                          fontWeight: FontWeight.w800,
+                          color: AppColors.primary,
                         ),
-                      );
-                    }).toList(),
+                      ),
+                    ],
                   ),
                 ],
               ),
             ),
-            const SizedBox(width: 10),
-            const Icon(Icons.chevron_right,
-                size: 20, color: AppColors.textTertiary),
+            const SizedBox(width: 4),
+            const Icon(Icons.chevron_right_rounded,
+                size: 24, color: AppColors.textTertiary),
           ],
         ),
       ),

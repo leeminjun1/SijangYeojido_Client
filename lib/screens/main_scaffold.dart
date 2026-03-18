@@ -37,45 +37,48 @@ class _MainScaffoldState extends State<MainScaffold> {
         children: _screens,
       ),
       bottomNavigationBar: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           color: AppColors.surface,
           boxShadow: [
             BoxShadow(
-              color: Color(0x0C000000),
-              blurRadius: 24,
-              offset: Offset(0, -4),
+              color: Colors.black.withValues(alpha: 0.05),
+              blurRadius: 30,
+              offset: const Offset(0, -10),
             ),
           ],
+          border: Border(
+            top: BorderSide(color: AppColors.border.withValues(alpha: 0.5), width: 0.5),
+          ),
         ),
         child: SafeArea(
           child: SizedBox(
-            height: 60,
+            height: 64,
             child: Row(
               children: [
                 _NavItem(
-                  icon: Icons.home_outlined,
-                  activeIcon: Icons.home,
+                  icon: Icons.home_rounded,
+                  activeIcon: Icons.home_rounded,
                   label: '홈',
                   isSelected: _currentIndex == 0,
                   onTap: () => setState(() => _currentIndex = 0),
                 ),
                 _NavItem(
                   icon: Icons.location_on_outlined,
-                  activeIcon: Icons.location_on,
+                  activeIcon: Icons.location_on_rounded,
                   label: '내 주변',
                   isSelected: _currentIndex == 1,
                   onTap: () => setState(() => _currentIndex = 1),
                 ),
                 _NavItem(
                   icon: Icons.receipt_long_outlined,
-                  activeIcon: Icons.receipt_long,
-                  label: '예약',
+                  activeIcon: Icons.receipt_long_rounded,
+                  label: '진행중',
                   isSelected: _currentIndex == 2,
                   onTap: () => setState(() => _currentIndex = 2),
                 ),
                 _NavItem(
-                  icon: Icons.person_outline,
-                  activeIcon: Icons.person,
+                  icon: Icons.person_outline_rounded,
+                  activeIcon: Icons.person_rounded,
                   label: '마이',
                   isSelected: _currentIndex == 3,
                   onTap: () => setState(() => _currentIndex = 3),
@@ -116,20 +119,20 @@ class _NavItem extends StatelessWidget {
             Icon(
               isSelected ? activeIcon : icon,
               color: isSelected
-                  ? AppColors.textPrimary
+                  ? AppColors.primary
                   : AppColors.textTertiary,
-              size: 24,
+              size: 26,
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: 5),
             Text(
               label,
               style: TextStyle(
                 fontSize: 10,
-                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                fontWeight: isSelected ? FontWeight.w900 : FontWeight.w700,
                 color: isSelected
-                    ? AppColors.textPrimary
+                    ? AppColors.primary
                     : AppColors.textTertiary,
-                letterSpacing: -0.2,
+                letterSpacing: -0.5,
               ),
             ),
           ],

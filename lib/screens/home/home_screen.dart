@@ -3,14 +3,13 @@ import 'package:flutter/material.dart';
 import '../../data/mock_data.dart';
 import '../../models/models.dart';
 import '../../theme/app_colors.dart';
+import '../../theme/sijang_design_system.dart';
 import '../../widgets/shrinkable_button.dart';
 import 'package:sijangyeojido_client/screens/map/market_hub_screen.dart';
 import '../../widgets/skeleton.dart';
 import '../explore/search_screen.dart';
 import '../../services/favorite_service.dart';
 import '../map/store_detail_screen.dart';
-import '../../services/recommendation_service.dart';
-import '../../widgets/app_card.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -51,14 +50,6 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
 
-  String get _dateString {
-    final now = DateTime.now();
-    const weekdays = ['월', '화', '수', '목', '금', '토', '일'];
-    final m = now.month;
-    final d = now.day;
-    final w = weekdays[now.weekday - 1];
-    return '$m월 $d일 $w요일';
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -71,61 +62,11 @@ class _HomeScreenState extends State<HomeScreen> {
       backgroundColor: AppColors.background,
       body: CustomScrollView(
         slivers: [
-          // ── Greeting Header ────────────────────────────────────
-          SliverAppBar(
-            backgroundColor: AppColors.surface,
-            surfaceTintColor: AppColors.surface,
-            scrolledUnderElevation: 0,
-            expandedHeight: 140,
-            pinned: true,
-            flexibleSpace: FlexibleSpaceBar(
-              titlePadding: const EdgeInsets.only(left: 20, bottom: 16),
-              title: Text(
-                '시장여지도',
-                style: textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: -0.5,
-                  color: AppColors.textPrimary,
-                ),
-              ),
-              background: Container(
-                color: AppColors.surface,
-                alignment: Alignment.bottomLeft,
-                padding: const EdgeInsets.fromLTRB(20, 0, 20, 52),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      _greeting,
-                      style: textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.w800,
-                        color: AppColors.textPrimary,
-                        letterSpacing: -0.3,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      _dateString,
-                      style: textTheme.bodySmall?.copyWith(
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.textSecondary,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-
-          _buildPhase3Logistics(),
-          const SliverToBoxAdapter(child: SizedBox(height: 12)),
-
-          // ── Search Bar ─────────────────────────────────────────
+          // ── Search Bar (Top) ──────────────────────────────────
           SliverToBoxAdapter(
             child: Container(
               color: AppColors.surface,
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              padding: const EdgeInsets.fromLTRB(20, 64, 20, 12),
               child: ShrinkableButton(
                 onTap: () {
                   Navigator.push(
@@ -134,20 +75,28 @@ class _HomeScreenState extends State<HomeScreen> {
                   );
                 },
                 child: Container(
-                  height: 52,
+                  height: 56,
                   decoration: BoxDecoration(
                     color: AppColors.background,
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: AppColors.border.withValues(alpha: 0.5)),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.02),
+                        blurRadius: 20,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
                   ),
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Row(
                     children: [
                       const Icon(Icons.search_rounded,
-                          color: AppColors.primary, size: 22),
-                      const SizedBox(width: 8),
+                          color: AppColors.primary, size: 24),
+                      const SizedBox(width: 12),
                       Text(
                         '가게, 품목, 구역 검색',
-                        style: textTheme.bodyMedium?.copyWith(
+                        style: textTheme.bodyLarge?.copyWith(
                           color: AppColors.textTertiary,
                           fontWeight: FontWeight.w600,
                         ),
@@ -158,6 +107,97 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
           ),
+
+          // ── Cinematic Storytelling Header (V7) ───────────────────
+          SliverToBoxAdapter(
+            child: Container(
+              height: 420,
+              color: AppColors.surface,
+              child: Stack(
+                children: [
+                   // Dynamic Narrative Image (V7)
+                   TweenAnimationBuilder<double>(
+                     tween: Tween(begin: 1.1, end: 1.0),
+                     duration: SDS.durationSlow,
+                     curve: SDS.curveEntrance,
+                     builder: (context, scale, child) {
+                       return Transform.scale(
+                         scale: scale,
+                         child: Container(
+                           decoration: const BoxDecoration(
+                             image: DecorationImage(
+                               image: NetworkImage('https://images.unsplash.com/photo-1590301157890-4810ed352733?auto=format&fit=crop&q=80&w=1000'),
+                             ),
+                           ),
+                         ),
+                       );
+                     },
+                   ),
+                   // Sophisticated Gradient Overlay
+                   Container(
+                     decoration: BoxDecoration(
+                       gradient: LinearGradient(
+                         begin: Alignment.topCenter,
+                           end: Alignment.bottomCenter,
+                           colors: [
+                             Colors.black.withValues(alpha: 0.4),
+                             Colors.transparent,
+                             AppColors.surface.withValues(alpha: 0.8),
+                             AppColors.surface,
+                           ],
+                           stops: const [0.0, 0.4, 0.85, 1.0],
+                       ),
+                     ),
+                   ),
+                   // Narrative Content
+                   Positioned(
+                     left: SDS.gutter,
+                     right: SDS.gutter,
+                     bottom: SDS.spaceXL,
+                     child: Column(
+                       crossAxisAlignment: CrossAxisAlignment.start,
+                       children: [
+                         Container(
+                           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                           decoration: SDS.glassDecoration(opacity: 0.2, blur: 8),
+                           child: const Text(
+                             '오늘의 발견 🇰🇷',
+                             style: TextStyle(
+                               fontSize: 12,
+                               fontWeight: FontWeight.w900,
+                               color: Colors.white,
+                               letterSpacing: 1.0,
+                             ),
+                           ),
+                         ),
+                         const SizedBox(height: 16),
+                         Text(
+                           '100년 전통의 맛,\n광장시장이 부릅니다',
+                           style: TextStyle(
+                             fontSize: 34,
+                             fontWeight: FontWeight.w900,
+                             color: AppColors.textPrimary,
+                             letterSpacing: -1.5,
+                             height: 1.1,
+                           ),
+                         ),
+                         const SizedBox(height: SDS.spaceM),
+                         Text(
+                           _greeting,
+                           style: TextStyle(
+                             fontSize: 15,
+                             fontWeight: FontWeight.w700,
+                             color: AppColors.textSecondary,
+                           ),
+                         ),
+                       ],
+                     ),
+                   ),
+                ],
+              ),
+            ),
+          ),
+
 
 
           // ── Favorites Section ──────────────────────────────────
@@ -266,7 +306,6 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
 
-          _buildPhase3Recommendations(textTheme),
 
           // ── Market Section ─────────────────────────────────────
           SliverToBoxAdapter(
@@ -280,12 +319,12 @@ class _HomeScreenState extends State<HomeScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          '내 주변에 있는\n활기찬 전통시장 🗺️',
-                          style: textTheme.titleLarge?.copyWith(
+                          '지금,\n전통시장을 활짝 열어보세요 🎞️',
+                          style: textTheme.headlineSmall?.copyWith(
                             fontWeight: FontWeight.w900,
                             color: AppColors.textPrimary,
-                            height: 1.3,
-                            letterSpacing: -0.3,
+                            height: 1.25,
+                            letterSpacing: -1.0,
                           ),
                         ),
                         const SizedBox(height: 4),
@@ -348,7 +387,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 : SliverList(
                     delegate: SliverChildBuilderDelegate(
                       (context, index) {
-                        final market = _mockMarkets[index];
+                        final market = MockData.markets[index];
                         return Padding(
                           padding: const EdgeInsets.only(bottom: 14),
                           child: _MarketCard(
@@ -357,7 +396,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         );
                       },
-                      childCount: _mockMarkets.length,
+                      childCount: MockData.markets.length,
                     ),
                   ),
           ),
@@ -365,185 +404,10 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
-
-  Widget _buildPhase3Logistics() {
-    return SliverToBoxAdapter(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        child: ShrinkableButton(
-          onTap: () {},
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            decoration: BoxDecoration(
-              color: AppColors.primary.withValues(alpha: 0.05),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: AppColors.primary.withValues(alpha: 0.1)),
-            ),
-            child: Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: const BoxDecoration(
-                    color: AppColors.primary,
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(Icons.shopping_bag_rounded, color: Colors.white, size: 16),
-                ),
-                const SizedBox(width: 12),
-                const Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '현재 준비 중인 주문이 1건 있어요',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w800,
-                          color: AppColors.textPrimary,
-                        ),
-                      ),
-                      Text(
-                        '할머니빈대떡 • 픽업 대기 중',
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.textSecondary,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const Icon(Icons.chevron_right_rounded, color: AppColors.textTertiary),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildPhase3Recommendations(TextTheme textTheme) {
-    return SliverToBoxAdapter(
-      child: ListenableBuilder(
-        listenable: FavoriteService(),
-        builder: (context, _) {
-          final recommended = RecommendationService().getRecommendedStores();
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(20, 32, 20, 16),
-                child: Row(
-                  children: [
-                    const Icon(Icons.auto_awesome_rounded, color: Colors.amber, size: 20),
-                    const SizedBox(width: 8),
-                    Text(
-                      '나만을 위한 스마트 추천',
-                      style: textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.w900,
-                        color: AppColors.textPrimary,
-                        letterSpacing: -0.5,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              SizedBox(
-                height: 180,
-                child: ListView.builder(
-                  padding: const EdgeInsets.symmetric(horizontal: 14),
-                  scrollDirection: Axis.horizontal,
-                  itemCount: recommended.length,
-                  itemBuilder: (context, index) {
-                    final store = recommended[index];
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 6),
-                      child: ShrinkableButton(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => StoreDetailScreen(store: store),
-                            ),
-                          );
-                        },
-                        child: Container(
-                          width: 220,
-                          decoration: BoxDecoration(
-                            color: AppColors.surface,
-                            borderRadius: BorderRadius.circular(24),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.03),
-                                blurRadius: 10,
-                                offset: const Offset(0, 4),
-                              ),
-                            ],
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              ClipRRect(
-                                borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-                                child: Container(
-                                  height: 100,
-                                  width: double.infinity,
-                                  decoration: BoxDecoration(
-                                    gradient: LinearGradient(
-                                      colors: [
-                                        AppColors.primary.withValues(alpha: 0.2),
-                                        AppColors.primary.withValues(alpha: 0.05),
-                                      ],
-                                    ),
-                                  ),
-                                  child: Center(
-                                    child: Icon(Icons.auto_awesome_rounded, color: AppColors.primary.withValues(alpha: 0.2), size: 40),
-                                  ),
-                                ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.all(12),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      store.name,
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: textTheme.titleSmall?.copyWith(
-                                        fontWeight: FontWeight.w800,
-                                        color: AppColors.textPrimary,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      '${store.category} • ${store.zoneId}구역',
-                                      style: textTheme.labelSmall?.copyWith(
-                                        color: AppColors.textSecondary,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ),
-            ],
-          );
-        },
-      ),
-    );
-  }
 }
 
 class _MarketCard extends StatelessWidget {
-  final _MarketInfo market;
+  final MarketInfo market;
   final int openStoreCount;
 
   const _MarketCard({
@@ -564,31 +428,22 @@ class _MarketCard extends StatelessWidget {
           ),
         );
       },
-      shrinkScale: 0.98,
+      shrinkScale: 0.96,
       child: Container(
-        padding: const EdgeInsets.all(20),
+        margin: const EdgeInsets.symmetric(vertical: 8),
+        padding: const EdgeInsets.all(26),
         decoration: BoxDecoration(
-          gradient: market.isAvailable
-              ? LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    AppColors.primary.withValues(alpha: 0.08),
-                    AppColors.accent.withValues(alpha: 0.06),
-                  ],
-                )
-              : null,
-          color: market.isAvailable ? null : AppColors.surface,
-          borderRadius: BorderRadius.circular(28),
-          boxShadow: [
-            BoxShadow(
-              color: market.isAvailable
-                  ? AppColors.primary.withValues(alpha: 0.08)
-                  : AppColors.cardShadowLight,
-              blurRadius: 20,
-              offset: const Offset(0, 6),
-            ),
-          ],
+          color: market.isAvailable ? AppColors.surface : AppColors.surface.withValues(alpha: 0.6),
+          borderRadius: BorderRadius.circular(SDS.radiusL),
+          border: Border.all(
+            color: market.isAvailable 
+                ? market.accentColor.withValues(alpha: 0.18) 
+                : AppColors.border.withValues(alpha: 0.5),
+            width: 1.8,
+          ),
+          boxShadow: market.isAvailable 
+              ? SDS.shadowAccent(market.accentColor)
+              : SDS.shadowSoft,
         ),
         child: Row(
           children: [
@@ -608,7 +463,7 @@ class _MarketCard extends StatelessWidget {
                             color: market.isAvailable
                                 ? AppColors.textPrimary
                                 : AppColors.textTertiary,
-                            letterSpacing: -0.6,
+                            letterSpacing: -1.0,
                           ),
                         ),
                       ),
@@ -616,23 +471,36 @@ class _MarketCard extends StatelessWidget {
                       if (market.isAvailable)
                         Container(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 12, vertical: 6),
+                              horizontal: 10, vertical: 4),
                           decoration: BoxDecoration(
-                            color: AppColors.primary.withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(100),
+                            gradient: LinearGradient(
+                              colors: [
+                                market.accentColor,
+                                market.accentColor.withValues(alpha: 0.8),
+                              ],
+                            ),
+                            borderRadius: BorderRadius.circular(12),
+                            boxShadow: [
+                              BoxShadow(
+                                color: market.accentColor.withValues(alpha: 0.25),
+                                blurRadius: 10,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
                           ),
                           child: Text(
-                            '실내 지도',
-                            style: textTheme.labelLarge?.copyWith(
-                              fontSize: 12,
+                            'MAP',
+                            style: textTheme.labelSmall?.copyWith(
+                              fontSize: 10,
                               fontWeight: FontWeight.w900,
-                              color: AppColors.primary,
+                              color: Colors.white,
+                              letterSpacing: 1.0,
                             ),
                           ),
                         ),
                     ],
                   ),
-                  const SizedBox(height: 6),
+                  const SizedBox(height: 8),
                   Text(
                     market.description,
                     maxLines: 2,
@@ -642,45 +510,53 @@ class _MarketCard extends StatelessWidget {
                       color: market.isAvailable
                           ? AppColors.textSecondary
                           : AppColors.textTertiary,
-                      height: 1.4,
+                      height: 1.5,
+                      letterSpacing: -0.2,
                     ),
                   ),
-                  const SizedBox(height: 10),
-                  // Stats row (only for available markets)
+                  const SizedBox(height: 16),
                   if (market.isAvailable) ...[
                     Row(
                       children: [
                         _MiniStat(
                           icon: Icons.storefront_rounded,
-                          label: '$openStoreCount곳 영업 중',
+                          label: '$openStoreCount개 매장 운영 중',
                           color: AppColors.success,
+                        ),
+                        const SizedBox(width: 12),
+                        _MiniStat(
+                          icon: Icons.location_on_rounded,
+                          label: '실시간 지도 지원',
+                          color: market.accentColor,
                         ),
                       ],
                     ),
-                    const SizedBox(height: 10),
+                    const SizedBox(height: 16),
                   ],
                   Wrap(
-                    spacing: 6,
-                    runSpacing: 6,
+                    spacing: 8,
+                    runSpacing: 8,
                     children: market.highlights.map((h) {
-                      final color = market.isAvailable
-                          ? AppColors.primary
-                          : AppColors.textTertiary;
                       return Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 6),
+                            horizontal: 12, vertical: 6),
                         decoration: BoxDecoration(
                           color: market.isAvailable
-                              ? AppColors.surface.withValues(alpha: 0.85)
-                              : AppColors.background,
+                              ? AppColors.background
+                              : AppColors.background.withValues(alpha: 0.5),
                           borderRadius: BorderRadius.circular(100),
+                          border: Border.all(
+                            color: AppColors.border.withValues(alpha: 0.3),
+                          ),
                         ),
                         child: Text(
                           '#$h',
                           style: textTheme.labelLarge?.copyWith(
                             fontSize: 12,
-                            fontWeight: FontWeight.w800,
-                            color: color,
+                            fontWeight: FontWeight.w700,
+                            color: market.isAvailable
+                                ? AppColors.textSecondary
+                                : AppColors.textTertiary,
                           ),
                         ),
                       );
@@ -689,211 +565,45 @@ class _MarketCard extends StatelessWidget {
                 ],
               ),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: 16),
             if (market.isAvailable)
               Container(
-                width: 48,
-                height: 48,
-                decoration: const BoxDecoration(
-                  color: AppColors.primary,
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: AppColors.surface,
                   shape: BoxShape.circle,
+                  border: Border.all(color: AppColors.border),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.05),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
                 ),
-                child: const Icon(Icons.arrow_forward_rounded,
-                    color: Colors.white),
+                child: const Icon(Icons.chevron_right_rounded,
+                    color: AppColors.textPrimary, size: 28),
               )
             else
               Container(
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 decoration: BoxDecoration(
                   color: AppColors.background,
                   borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: AppColors.border.withValues(alpha: 0.5)),
                 ),
-                child: const Text(
+                child: Text(
                   '준비 중',
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
+                  style: textTheme.labelSmall?.copyWith(
+                    fontWeight: FontWeight.w800,
                     color: AppColors.textTertiary,
                   ),
                 ),
               ),
           ],
         ),
-      ),
-    );
-  }
-  Widget _buildPhase3Logistics() {
-    return SliverToBoxAdapter(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        child: ShrinkableButton(
-          onTap: () {},
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            decoration: BoxDecoration(
-              color: AppColors.primary.withValues(alpha: 0.05),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: AppColors.primary.withValues(alpha: 0.1)),
-            ),
-            child: Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: const BoxDecoration(
-                    color: AppColors.primary,
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(Icons.shopping_bag_rounded, color: Colors.white, size: 16),
-                ),
-                const SizedBox(width: 12),
-                const Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '현재 준비 중인 주문이 1건 있어요',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w800,
-                          color: AppColors.textPrimary,
-                        ),
-                      ),
-                      Text(
-                        '할머니빈대떡 • 픽업 대기 중',
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.textSecondary,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const Icon(Icons.chevron_right_rounded, color: AppColors.textTertiary),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildPhase3Recommendations(TextTheme textTheme) {
-    return SliverToBoxAdapter(
-      child: ListenableBuilder(
-        listenable: FavoriteService(),
-        builder: (context, _) {
-          final recommended = RecommendationService().getRecommendedStores();
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(20, 32, 20, 16),
-                child: Row(
-                  children: [
-                    const Icon(Icons.auto_awesome_rounded, color: Colors.amber, size: 20),
-                    const SizedBox(width: 8),
-                    Text(
-                      '나만을 위한 스마트 추천',
-                      style: textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.w900,
-                        color: AppColors.textPrimary,
-                        letterSpacing: -0.5,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              SizedBox(
-                height: 180,
-                child: ListView.builder(
-                  padding: const EdgeInsets.symmetric(horizontal: 14),
-                  scrollDirection: Axis.horizontal,
-                  itemCount: recommended.length,
-                  itemBuilder: (context, index) {
-                    final store = recommended[index];
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 6),
-                      child: ShrinkableButton(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => StoreDetailScreen(store: store),
-                            ),
-                          );
-                        },
-                        child: Container(
-                          width: 220,
-                          decoration: BoxDecoration(
-                            color: AppColors.surface,
-                            borderRadius: BorderRadius.circular(24),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.03),
-                                blurRadius: 10,
-                                offset: const Offset(0, 4),
-                              ),
-                            ],
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              ClipRRect(
-                                borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-                                child: Container(
-                                  height: 100,
-                                  width: double.infinity,
-                                  decoration: BoxDecoration(
-                                    gradient: LinearGradient(
-                                      colors: [
-                                        AppColors.primary.withValues(alpha: 0.2),
-                                        AppColors.primary.withValues(alpha: 0.05),
-                                      ],
-                                    ),
-                                  ),
-                                  child: Center(
-                                    child: Icon(Icons.auto_awesome_rounded, color: AppColors.primary.withValues(alpha: 0.2), size: 40),
-                                  ),
-                                ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.all(12),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      store.name,
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: textTheme.titleSmall?.copyWith(
-                                        fontWeight: FontWeight.w800,
-                                        color: AppColors.textPrimary,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      '${store.category} • ${store.zoneId}구역',
-                                      style: textTheme.labelSmall?.copyWith(
-                                        color: AppColors.textSecondary,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ),
-            ],
-          );
-        },
       ),
     );
   }
@@ -930,54 +640,3 @@ class _MiniStat extends StatelessWidget {
   }
 }
 
-// ── Mock Market Data ─────────────────────────────────────────────────────────
-
-class _MarketInfo {
-  final String name;
-  final String description;
-  final String address;
-  final int storeCount;
-  final List<String> highlights;
-  final Color accentColor;
-  final bool isAvailable;
-
-  const _MarketInfo({
-    required this.name,
-    required this.description,
-    required this.address,
-    required this.storeCount,
-    required this.highlights,
-    required this.accentColor,
-    required this.isAvailable,
-  });
-}
-
-const List<_MarketInfo> _mockMarkets = [
-  _MarketInfo(
-    name: '광장시장',
-    description: '100년 전통, 빈대떡과 육회의 성지',
-    address: '서울 종로구 창경궁로 88',
-    storeCount: 5240,
-    highlights: ['먹거리명소', '빈대떡', '마약김밥'],
-    accentColor: Color(0xFFF04452),
-    isAvailable: true,
-  ),
-  _MarketInfo(
-    name: '경동시장',
-    description: '도심 속 최대 규모의 농수산물 특화 시장',
-    address: '서울 동대문구 고산자로36길 3',
-    storeCount: 3120,
-    highlights: ['한약재', '신선도', '도매가'],
-    accentColor: Color(0xFF16A34A),
-    isAvailable: false,
-  ),
-  _MarketInfo(
-    name: '망원시장',
-    description: '트렌디한 먹거리와 젊음이 가득한 시장',
-    address: '서울 마포구 포은로8길 14',
-    storeCount: 1850,
-    highlights: ['닭강정', '디저트', '데이트코스'],
-    accentColor: Color(0xFF2563EB),
-    isAvailable: false,
-  ),
-];

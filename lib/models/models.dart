@@ -46,6 +46,7 @@ class Store {
   final double mapY;
   final int? freshness; // 0-100
   final String? inventoryStatus; // e.g., '여유', '매진임박', '품절'
+  final String marketName;
 
   const Store({
     required this.id,
@@ -62,6 +63,7 @@ class Store {
     required this.mapY,
     this.freshness,
     this.inventoryStatus,
+    this.marketName = '광장시장',
   });
 
 

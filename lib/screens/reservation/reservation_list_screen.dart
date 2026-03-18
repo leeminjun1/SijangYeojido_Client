@@ -47,10 +47,11 @@ class _ReservationListScreenState extends State<ReservationListScreen> {
             elevation: 0,
             centerTitle: false,
             title: Text(
-              '예약',
+              '진행중', // Renamed to match the Nav Bar's new 'Progress' feel
               style: textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.w800,
+                fontWeight: FontWeight.w900,
                 color: AppColors.textPrimary,
+                letterSpacing: -1.0,
               ),
             ),
           ),
@@ -213,72 +214,75 @@ class _ActiveReservationCard extends StatelessWidget {
                         ),
                       ),
                       Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 6),
-                        decoration: BoxDecoration(
-                          color: isUrgent
-                              ? AppColors.primary
-                              : AppColors.surface.withValues(alpha: 0.9),
-                          borderRadius: BorderRadius.circular(100),
-                          border: Border.all(
-                            color: isUrgent ? Colors.transparent : AppColors.border,
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: isUrgent
+                                ? AppColors.primary
+                                : AppColors.surface,
+                            borderRadius: BorderRadius.circular(100),
+                            border: Border.all(
+                              color: isUrgent ? Colors.white.withValues(alpha: 0.3) : AppColors.border,
+                              width: 1.5,
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: (isUrgent ? AppColors.primary : Colors.black).withValues(alpha: 0.1),
+                                blurRadius: 10,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.timer_rounded,
+                                size: 14,
+                                color: isUrgent ? Colors.white : AppColors.primary,
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                '$mins:${secs.toString().padLeft(2, '0')}',
+                                style: textTheme.labelLarge?.copyWith(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w900,
+                                  color: isUrgent
+                                      ? Colors.white
+                                      : AppColors.textPrimary,
+                                  fontFeatures: const [
+                                    FontFeature.tabularFigures()
+                                  ],
+                                  letterSpacing: 0.5,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              Icons.timer_rounded,
-                              size: 14,
-                              color: isUrgent ? Colors.white : AppColors.primary,
-                            ),
-                            const SizedBox(width: 6),
-                            Text(
-                              '$mins:${secs.toString().padLeft(2, '0')}',
-                              style: textTheme.labelLarge?.copyWith(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w900,
-                                color: isUrgent
-                                    ? Colors.white
-                                    : AppColors.textPrimary,
-                                fontFeatures: const [
-                                  FontFeature.tabularFigures()
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
                     ],
                   ),
                   const SizedBox(height: 12),
                   AppCard(
-                    padding: const EdgeInsets.all(12),
-                    backgroundColor: AppColors.surface.withValues(alpha: 0.9),
+                    padding: const EdgeInsets.all(16),
+                    backgroundColor: AppColors.surface,
                     child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Expanded(
-                          child: _InfoItem(
-                              label: '수량', value: '${reservation.quantity}개'),
+                        _InfoItem(
+                            label: '수량', value: '${reservation.quantity}개'),
+                        _InfoItem(
+                          label: '결제금액',
+                          value: '${fmt.format(reservation.totalAmount)}원',
                         ),
-                        Expanded(
-                          child: _InfoItem(
-                            label: '결제금액',
-                            value: '${fmt.format(reservation.totalAmount)}원',
-                          ),
-                        ),
-                        Expanded(
-                          child: _InfoItem(
-                            label: '픽업코드',
-                            value: reservation.pickupCode,
-                            valueStyle: textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.w900,
-                              color: AppColors.primary,
-                              letterSpacing: 3,
-                              fontFeatures: const [
-                                FontFeature.tabularFigures()
-                              ],
-                            ),
+                        _InfoItem(
+                          label: '픽업코드',
+                          value: reservation.pickupCode,
+                          valueStyle: textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w900,
+                            color: AppColors.primary,
+                            letterSpacing: 2,
+                            fontFeatures: const [
+                              FontFeature.tabularFigures()
+                            ],
                           ),
                         ),
                       ],
@@ -341,29 +345,44 @@ class _PastReservationCard extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
     final fmt = NumberFormat('#,###');
 
-    return AppCard(
-      margin: const EdgeInsets.fromLTRB(16, 0, 16, 10),
-      padding: const EdgeInsets.all(16),
+    return Container(
+      margin: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: AppColors.border.withValues(alpha: 0.5)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 20,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
       child: Row(
         children: [
           Container(
-            width: 40,
-            height: 40,
+            width: 44,
+            height: 44,
             decoration: BoxDecoration(
               color: reservation.isCompleted
-                  ? AppColors.successLight
+                  ? AppColors.success.withValues(alpha: 0.05)
                   : AppColors.background,
               shape: BoxShape.circle,
+              border: Border.all(
+                color: (reservation.isCompleted ? AppColors.success : AppColors.border).withValues(alpha: 0.1),
+              ),
             ),
             child: Icon(
-              reservation.isCompleted ? Icons.check_circle : Icons.cancel,
+              reservation.isCompleted ? Icons.check_circle_rounded : Icons.cancel_rounded,
               color: reservation.isCompleted
                   ? AppColors.success
                   : AppColors.textTertiary,
-              size: 20,
+              size: 22,
             ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: 16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -373,17 +392,18 @@ class _PastReservationCard extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: textTheme.bodyLarge?.copyWith(
-                    fontWeight: FontWeight.w800,
+                    fontWeight: FontWeight.w900,
                     color: AppColors.textPrimary,
+                    letterSpacing: -0.5,
                   ),
                 ),
-                const SizedBox(height: 2),
+                const SizedBox(height: 3),
                 Text(
                   reservation.storeName,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: textTheme.bodySmall?.copyWith(
-                    fontWeight: FontWeight.w600,
+                    fontWeight: FontWeight.w700,
                     color: AppColors.textSecondary,
                   ),
                 ),
@@ -398,22 +418,23 @@ class _PastReservationCard extends StatelessWidget {
                 style: textTheme.bodyLarge?.copyWith(
                   fontWeight: FontWeight.w900,
                   color: AppColors.textPrimary,
+                  letterSpacing: -0.2,
                 ),
               ),
-              const SizedBox(height: 2),
+              const SizedBox(height: 6),
               Container(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
                   color: reservation.isCompleted
-                      ? AppColors.successLight
-                      : AppColors.divider,
+                      ? AppColors.success.withValues(alpha: 0.1)
+                      : AppColors.background,
                   borderRadius: BorderRadius.circular(100),
                 ),
                 child: Text(
                   reservation.isCompleted ? '픽업 완료' : '만료',
                   style: textTheme.labelLarge?.copyWith(
-                    fontSize: 12,
+                    fontSize: 11,
                     fontWeight: FontWeight.w900,
                     color: reservation.isCompleted
                         ? AppColors.success

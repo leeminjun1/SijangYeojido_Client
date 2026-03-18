@@ -1,8 +1,64 @@
+import 'package:flutter/material.dart';
 import '../models/models.dart';
 import '../theme/app_colors.dart';
 
+class MarketInfo {
+  final String name;
+  final String description;
+  final String address;
+  final int storeCount;
+  final List<String> highlights;
+  final Color accentColor;
+  final bool isAvailable;
+
+  const MarketInfo({
+    required this.name,
+    required this.description,
+    required this.address,
+    required this.storeCount,
+    required this.highlights,
+    required this.accentColor,
+    required this.isAvailable,
+  });
+}
+
 class MockData {
   static final DateTime _now = DateTime.now();
+
+  static const List<MarketInfo> markets = [
+    MarketInfo(
+      name: '광장시장',
+      description: '100년 전통, 빈대떡과 육회의 성지',
+      address: '서울 종로구 창경궁로 88',
+      storeCount: 5240,
+      highlights: ['먹거리명소', '빈대떡', '마약김밥'],
+      accentColor: Color(0xFFF04452),
+      isAvailable: true,
+    ),
+    MarketInfo(
+      name: '경동시장',
+      description: '도심 속 최대 규모의 농수산물 특화 시장',
+      address: '서울 동대문구 고산자로36길 3',
+      storeCount: 3120,
+      highlights: ['한약재', '신선도', '도매가'],
+      accentColor: Color(0xFF16A34A),
+      isAvailable: false,
+    ),
+    MarketInfo(
+      name: '망원시장',
+      description: '트렌디한 먹거리와 젊음이 가득한 시장',
+      address: '서울 마포구 포은로8길 14',
+      storeCount: 1850,
+      highlights: ['닭강정', '디저트', '데이트코스'],
+      accentColor: Color(0xFF2563EB),
+      isAvailable: false,
+    ),
+  ];
+
+  static MarketInfo getMarket(String name) {
+    return markets.firstWhere((m) => m.name == name,
+        orElse: () => markets.first);
+  }
 
 
 

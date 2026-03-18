@@ -5,7 +5,6 @@ import '../../data/mock_data.dart';
 import '../../theme/app_colors.dart';
 import '../../widgets/shrinkable_button.dart';
 import '../../widgets/app_ui.dart';
-import '../market/market_info_screen.dart';
 import '../../services/favorite_service.dart';
 
 class StoreDetailScreen extends StatelessWidget {
@@ -21,6 +20,7 @@ class StoreDetailScreen extends StatelessWidget {
         : null;
     final isStale = (daysSinceUpdate ?? 0) > 7;
     final fmt = NumberFormat('#,###', 'ko_KR');
+    final market = MockData.getMarket(store.marketName);
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -87,90 +87,140 @@ class StoreDetailScreen extends StatelessWidget {
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
                         colors: [
-                          AppColors.primary.withValues(alpha: 0.15),
+                          market.accentColor.withValues(alpha: 0.15),
+                          market.accentColor.withValues(alpha: 0.05),
                           AppColors.background,
                         ],
+                        stops: const [0.0, 0.5, 1.0],
                       ),
                     ),
-                    padding: EdgeInsets.fromLTRB(20, MediaQuery.of(context).padding.top + 50, 20, 32),
+                    padding: EdgeInsets.fromLTRB(24, MediaQuery.of(context).padding.top + 40, 24, 40),
                     child: Column(
                       children: [
                         Hero(
                           tag: 'store_image_${store.id}',
                           child: Container(
-                            width: 100,
-                            height: 100,
+                            width: 120,
+                            height: 120,
                             decoration: BoxDecoration(
                               color: AppColors.surface,
-                              borderRadius: BorderRadius.circular(32),
+                              borderRadius: BorderRadius.circular(40),
+                              border: Border.all(
+                                color: AppColors.primary.withValues(alpha: 0.1),
+                                width: 2,
+                              ),
                               boxShadow: [
                                 BoxShadow(
-                                  color: AppColors.primary.withValues(alpha: 0.12),
+                                  color: AppColors.primary.withValues(alpha: 0.15),
+                                  blurRadius: 40,
+                                  offset: const Offset(0, 15),
+                                ),
+                                BoxShadow(
+                                  color: Colors.white.withValues(alpha: 0.8),
                                   blurRadius: 20,
-                                  offset: const Offset(0, 10),
+                                  offset: const Offset(0, -10),
+                                  spreadRadius: -5,
                                 ),
                               ],
                             ),
                             child: Center(
                               child: Icon(
                                 _iconForCategory(store.category),
-                                size: 52,
+                                size: 56,
                                 color: AppColors.primary,
                               ),
                             ),
                           ),
                         ),
-                        const SizedBox(height: 24),
-                        Text(
-                          store.name,
-                          textAlign: TextAlign.center,
-                          style: textTheme.displaySmall?.copyWith(
-                            fontWeight: FontWeight.w900,
-                            color: AppColors.textPrimary,
-                            letterSpacing: -1.0,
+                                          // --- Store Title and Quick Stats (V6 Staggered Entry) ---
+                  TweenAnimationBuilder<double>(
+                    tween: Tween(begin: 0.0, end: 1.0),
+                    duration: const Duration(milliseconds: 600),
+                    curve: Curves.easeOutCubic,
+                    builder: (context, value, child) {
+                      return Opacity(
+                        opacity: value,
+                        child: Transform.translate(
+                          offset: Offset(0, 30 * (1 - value)),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 24),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                      decoration: BoxDecoration(
+                                        color: market.accentColor.withValues(alpha: 0.1),
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: Text(
+                                        store.category,
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w900,
+                                          color: market.accentColor,
+                                          letterSpacing: 0.5,
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    if (store.unitNumber != null)
+                                      Text(
+                                        '호수: ${store.unitNumber}',
+                                        style: textTheme.bodySmall?.copyWith(
+                                          fontWeight: FontWeight.w700,
+                                          color: AppColors.textTertiary,
+                                        ),
+                                      ),
+                                  ],
+                                ),
+                                const SizedBox(height: 12),
+                                Text(
+                                  store.name,
+                                  style: textTheme.headlineMedium?.copyWith(
+                                    fontSize: 28, // Scaled down for better fit
+                                    fontWeight: FontWeight.w900,
+                                    color: AppColors.textPrimary,
+                                    letterSpacing: -1.0,
+                                    height: 1.25,
+                                  ),
+                                ),
+                                const SizedBox(height: 16),
+                                _StatusBadge(status: store.status),
+                              ],
+                            ),
                           ),
                         ),
-                        const SizedBox(height: 10),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                              decoration: BoxDecoration(
-                                color: AppColors.surface.withValues(alpha: 0.8),
-                                borderRadius: BorderRadius.circular(100),
-                                border: Border.all(color: AppColors.border.withValues(alpha: 0.5)),
-                              ),
-                              child: Text(
-                                store.category,
-                                style: textTheme.labelLarge?.copyWith(
-                                  color: AppColors.textSecondary,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            _StatusBadge(status: store.status),
-                          ],
-                        ),
-                        const SizedBox(height: 20),
-                        if (zone != null) 
+                      );
+                    },
+                  ),
+                        const SizedBox(height: 24),
+                        if (zone != null)
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
                             decoration: BoxDecoration(
-                              color: zone.color.withValues(alpha: 0.1),
-                              borderRadius: BorderRadius.circular(16),
+                              color: AppColors.surface,
+                              borderRadius: BorderRadius.circular(100),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.04),
+                                  blurRadius: 16,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ],
                             ),
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Icon(Icons.location_on_rounded, size: 16, color: zone.color),
-                                const SizedBox(width: 6),
+                                Icon(Icons.location_on_rounded, size: 16, color: market.accentColor.withValues(alpha: 0.5)),
+                                const SizedBox(width: 8),
                                 Text(
-                                  '${zone.name}구역${store.unitNumber != null ? " · ${store.unitNumber}호" : ""}',
+                                  '${zone.name} • ${store.unitNumber ?? "위치 정보 없음"}',
                                   style: textTheme.bodyMedium?.copyWith(
                                     fontWeight: FontWeight.w800,
-                                    color: zone.color,
+                                    color: AppColors.textPrimary,
                                   ),
                                 ),
                               ],
@@ -178,35 +228,12 @@ class StoreDetailScreen extends StatelessWidget {
                           ),
                         if (daysSinceUpdate != null) ...[
                           const SizedBox(height: 16),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                            decoration: BoxDecoration(
-                              color: isStale
-                                  ? AppColors.warningLight
-                                  : AppColors.surface.withValues(alpha: 0.6),
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(
-                                  isStale
-                                      ? Icons.report_problem_rounded
-                                      : Icons.update_rounded,
-                                  size: 14,
-                                  color: isStale
-                                      ? AppColors.warning
-                                      : AppColors.textTertiary,
-                                ),
-                                const SizedBox(width: 6),
-                                Text(
-                                  '${daysSinceUpdate == 0 ? "오늘" : daysSinceUpdate == 1 ? "어제" : "$daysSinceUpdate일 전"} 업데이트 · ${store.infoSource ?? "시스템 제보"}',
-                                  style: textTheme.bodySmall?.copyWith(
-                                    fontWeight: FontWeight.w600,
-                                    color: AppColors.textSecondary,
-                                  ),
-                                ),
-                              ],
+                          Text(
+                            '마지막 업데이트: ${daysSinceUpdate == 0 ? "오늘" : daysSinceUpdate == 1 ? "어제" : "$daysSinceUpdate일 전"} (${store.infoSource ?? "시스템 제보"})',
+                            style: textTheme.bodySmall?.copyWith(
+                              fontWeight: FontWeight.w700,
+                              color: isStale ? AppColors.warning : AppColors.textTertiary,
+                              fontSize: 11,
                             ),
                           ),
                         ],
@@ -311,108 +338,94 @@ class StoreDetailScreen extends StatelessWidget {
               ),
             ),
           ),
-
-          // --- Bottom Fixed Action Bar ---
-          Container(
-            padding: EdgeInsets.fromLTRB(
-              20,
-              16,
-              20,
-              MediaQuery.of(context).padding.bottom + 16,
-            ),
+        ],
+      ),
+      // --- Floating Control Center (V6 Capsule Design) ---
+      bottomNavigationBar: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+          child: Container(
+            height: 84,
+            padding: const EdgeInsets.symmetric(horizontal: 12),
             decoration: BoxDecoration(
-              color: AppColors.surface.withValues(alpha: 0.95),
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+              color: AppColors.surface,
+              borderRadius: BorderRadius.circular(100), // Perfect Capsule
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
+                  color: market.accentColor.withValues(alpha: 0.15),
                   blurRadius: 30,
-                  offset: const Offset(0, -10),
+                  offset: const Offset(0, 10),
+                  spreadRadius: -5,
+                ),
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.08),
+                  blurRadius: 20,
+                  offset: const Offset(0, 6),
                 ),
               ],
+              border: Border.all(
+                color: market.accentColor.withValues(alpha: 0.1),
+                width: 1.5,
+              ),
             ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
+            child: Row(
               children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: ShrinkableButton(
-                        onTap: () => Navigator.pop(context),
-                        child: Container(
-                          height: 56,
-                          decoration: BoxDecoration(
-                            gradient: AppUI.primaryGradient,
-                            borderRadius: BorderRadius.circular(18),
-                            boxShadow: [
-                              BoxShadow(
-                                color: AppColors.primary.withValues(alpha: 0.25),
-                                blurRadius: 15,
-                                offset: const Offset(0, 6),
-                              ),
-                            ],
+                const SizedBox(width: 12),
+                _ActionIconBtn(
+                  icon: Icons.phone_rounded,
+                  label: '전화',
+                  onTap: () {},
+                ),
+                const SizedBox(width: 8),
+                _ActionIconBtn(
+                  icon: Icons.share_rounded,
+                  label: '공유',
+                  onTap: () {},
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  flex: 3,
+                  child: ShrinkableButton(
+                    onTap: () {
+                      // Logic for reservation would go here
+                    },
+                    child: Container(
+                      height: 56,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            market.accentColor,
+                            market.accentColor.withValues(alpha: 0.8),
+                          ],
+                        ),
+                        borderRadius: BorderRadius.circular(100),
+                        boxShadow: [
+                          BoxShadow(
+                            color: market.accentColor.withValues(alpha: 0.3),
+                            blurRadius: 16,
+                            offset: const Offset(0, 4),
                           ),
-                          child: Center(
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                const Icon(Icons.map_rounded, color: Colors.white, size: 20),
-                                const SizedBox(width: 10),
-                                Text(
-                                  '지도에서 위치 보기',
-                                  style: textTheme.titleMedium?.copyWith(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w800,
-                                    letterSpacing: -0.2,
-                                  ),
-                                ),
-                              ],
-                            ),
+                        ],
+                      ),
+                      child: const Center(
+                        child: Text(
+                          '지금 예약하기',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w900,
+                            color: Colors.white,
+                            letterSpacing: -0.5,
                           ),
                         ),
                       ),
                     ),
-                  ],
+                  ),
                 ),
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    Expanded(
-                      child: _ActionButton(
-                        icon: Icons.directions_rounded,
-                        label: '길찾기',
-                        onTap: () {},
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: _ActionButton(
-                        icon: Icons.bookmark_border_rounded,
-                        label: '즐겨찾기',
-                        onTap: () {},
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: _ActionButton(
-                        icon: Icons.info_outline_rounded,
-                        label: '시장 정보',
-                        onTap: () {
-                          showModalBottomSheet(
-                            context: context,
-                            isScrollControlled: true,
-                            backgroundColor: Colors.transparent,
-                            builder: (context) => const MarketInfoScreen(),
-                          );
-                        },
-                      ),
-                    ),
-                  ],
-                ),
+                const SizedBox(width: 8),
               ],
             ),
           ),
-        ],
+        ),
       ),
     );
   }
@@ -685,46 +698,45 @@ class _PaymentChip extends StatelessWidget {
   }
 }
 
-class _ActionButton extends StatelessWidget {
+class _ActionIconBtn extends StatelessWidget {
   final IconData icon;
   final String label;
   final VoidCallback onTap;
-  final bool isDestructive;
 
-  const _ActionButton({
+  const _ActionIconBtn({
     required this.icon,
     required this.label,
     required this.onTap,
-    this.isDestructive = false,
   });
 
   @override
   Widget build(BuildContext context) {
-    final color =
-        isDestructive ? AppColors.textTertiary : AppColors.textSecondary;
-    return ShrinkableButton(
-      onTap: onTap,
-      child: Container(
-        height: 80,
-        decoration: BoxDecoration(
-          color: AppColors.background,
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, size: 24, color: color),
-            const SizedBox(height: 8),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w800,
-                color: color,
-                letterSpacing: -0.2,
+    return Expanded(
+      child: ShrinkableButton(
+        onTap: onTap,
+        child: Container(
+          height: 64,
+          decoration: BoxDecoration(
+            color: AppColors.background,
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(color: AppColors.border.withValues(alpha: 0.5)),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(icon, size: 20, color: AppColors.textSecondary),
+              const SizedBox(height: 4),
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w800,
+                  color: AppColors.textSecondary,
+                  letterSpacing: -0.2,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

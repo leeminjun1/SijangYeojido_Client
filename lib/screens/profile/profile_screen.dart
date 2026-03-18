@@ -23,8 +23,9 @@ class ProfileScreen extends StatelessWidget {
             title: Text(
               '마이',
               style: textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.w800,
+                fontWeight: FontWeight.w900,
                 color: AppColors.textPrimary,
+                letterSpacing: -1.0,
               ),
             ),
           ),
@@ -78,23 +79,25 @@ class _ProfileHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
     return Container(
-      margin: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-      padding: const EdgeInsets.all(20),
+      margin: const EdgeInsets.fromLTRB(20, 12, 20, 0),
+      padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            AppColors.primary.withValues(alpha: 0.06),
-            AppColors.accent.withValues(alpha: 0.04),
+            AppColors.primary.withValues(alpha: 0.12),
+            AppColors.accent.withValues(alpha: 0.05),
+            AppColors.surface,
           ],
         ),
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: const [
+        borderRadius: BorderRadius.circular(32),
+        border: Border.all(color: AppColors.primary.withValues(alpha: 0.05)),
+        boxShadow: [
           BoxShadow(
-            color: AppColors.cardShadow,
-            blurRadius: 16,
-            offset: Offset(0, 4),
+            color: AppColors.primary.withValues(alpha: 0.1),
+            blurRadius: 30,
+            offset: const Offset(0, 10),
           ),
         ],
       ),
@@ -204,15 +207,16 @@ class _StatCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Expanded(
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 16),
+        padding: const EdgeInsets.symmetric(vertical: 20),
         decoration: BoxDecoration(
           color: AppColors.surface,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: const [
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(color: AppColors.border.withValues(alpha: 0.5)),
+          boxShadow: [
             BoxShadow(
-              color: AppColors.cardShadowLight,
-              blurRadius: 10,
-              offset: Offset(0, 2),
+              color: Colors.black.withValues(alpha: 0.03),
+              blurRadius: 20,
+              offset: const Offset(0, 6),
             ),
           ],
         ),
@@ -450,12 +454,13 @@ class _Section extends StatelessWidget {
           margin: const EdgeInsets.symmetric(horizontal: 16),
           decoration: BoxDecoration(
             color: AppColors.surface,
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: const [
+            borderRadius: BorderRadius.circular(28),
+            border: Border.all(color: AppColors.border.withValues(alpha: 0.8)),
+            boxShadow: [
               BoxShadow(
-                color: AppColors.cardShadow,
-                blurRadius: 16,
-                offset: Offset(0, 4),
+                color: Colors.black.withValues(alpha: 0.04),
+                blurRadius: 30,
+                offset: const Offset(0, 10),
               ),
             ],
           ),

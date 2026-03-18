@@ -1,6 +1,9 @@
 import 'dart:math';
+import 'dart:ui';
 import 'package:flutter/material.dart';
+import '../../data/mock_data.dart';
 import '../../theme/app_colors.dart';
+import '../../theme/sijang_design_system.dart';
 import '../../widgets/shrinkable_button.dart';
 import '../map/market_hub_screen.dart';
 
@@ -22,40 +25,43 @@ class _NearbyMapScreenState extends State<NearbyMapScreen>
   // Mock market data with map positions (normalized 0-1)
   static final _markets = [
     _MarketPin(
-      name: '광장시장',
-      description: '100년 전통, 빈대떡과 육회의 성지',
-      address: '서울 종로구 창경궁로 88',
+      name: MockData.markets[0].name,
+      description: MockData.markets[0].description,
+      address: MockData.markets[0].address,
       distance: '350m',
       openStores: 42,
       totalStores: 68,
       x: 0.55,
       y: 0.42,
-      isAvailable: true,
-      highlights: ['먹거리명소', '빈대떡', '마약김밥'],
+      isAvailable: MockData.markets[0].isAvailable,
+      highlights: MockData.markets[0].highlights,
+      accentColor: MockData.markets[0].accentColor,
     ),
     _MarketPin(
-      name: '경동시장',
-      description: '도심 속 최대 규모의 농수산물 특화 시장',
-      address: '서울 동대문구 고산자로36길 3',
+      name: MockData.markets[1].name,
+      description: MockData.markets[1].description,
+      address: MockData.markets[1].address,
       distance: '1.2km',
       openStores: 0,
       totalStores: 120,
       x: 0.78,
       y: 0.28,
-      isAvailable: false,
-      highlights: ['한약재', '신선도', '도매가'],
+      isAvailable: MockData.markets[1].isAvailable,
+      highlights: MockData.markets[1].highlights,
+      accentColor: MockData.markets[1].accentColor,
     ),
     _MarketPin(
-      name: '망원시장',
-      description: '트렌디한 먹거리와 젊음이 가득한 시장',
-      address: '서울 마포구 포은로8길 14',
+      name: MockData.markets[2].name,
+      description: MockData.markets[2].description,
+      address: MockData.markets[2].address,
       distance: '3.5km',
       openStores: 0,
       totalStores: 85,
       x: 0.18,
       y: 0.55,
-      isAvailable: false,
-      highlights: ['닭강정', '디저트', '데이트코스'],
+      isAvailable: MockData.markets[2].isAvailable,
+      highlights: MockData.markets[2].highlights,
+      accentColor: MockData.markets[2].accentColor,
     ),
   ];
 
@@ -85,7 +91,6 @@ class _NearbyMapScreenState extends State<NearbyMapScreen>
   @override
   Widget build(BuildContext context) {
     final bottomPadding = MediaQuery.of(context).padding.bottom;
-    final topPadding = MediaQuery.of(context).padding.top;
 
     return Scaffold(
       backgroundColor: const Color(0xFFEEF1F6),
@@ -115,64 +120,61 @@ class _NearbyMapScreenState extends State<NearbyMapScreen>
             ),
           ),
 
-          // ── Top Search Bar Overlay ─────────────────────────────
+          // ── SDS Signature Search Bar (V7) ────────────────────────
           Positioned(
-            top: topPadding + 8,
-            left: 16,
-            right: 16,
-            child: Container(
-              height: 52,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              decoration: BoxDecoration(
-                color: AppColors.surface,
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.08),
-                    blurRadius: 20,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: Row(
-                children: [
-                  const Icon(Icons.search_rounded,
-                      size: 22, color: AppColors.textTertiary),
-                  const SizedBox(width: 10),
-                  Text(
-                    '주변 시장 검색',
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w500,
-                      color: AppColors.textTertiary,
-                    ),
-                  ),
-                  const Spacer(),
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                    decoration: BoxDecoration(
-                      color: AppColors.primaryLight,
-                      borderRadius: BorderRadius.circular(100),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.my_location_rounded,
-                            size: 13, color: AppColors.primary),
-                        const SizedBox(width: 4),
-                        Text(
-                          '종로구',
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w700,
-                            color: AppColors.primary,
-                          ),
+            top: SDS.gutter + MediaQuery.of(context).padding.top,
+            left: SDS.gutter,
+            right: SDS.gutter,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(SDS.radiusM),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+                child: Container(
+                  height: 68,
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  decoration: SDS.glassDecoration(opacity: 0.75, blur: 20),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.search_rounded,
+                          size: 24, color: AppColors.primary),
+                      const SizedBox(width: 16),
+                      Text(
+                        '어느 시장으로 갈까요?',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w800,
+                          color: AppColors.textTertiary,
+                          letterSpacing: -0.5,
                         ),
-                      ],
-                    ),
+                      ),
+                      const Spacer(),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 14, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: AppColors.primary.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(SDS.radiusCapsule),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(Icons.location_on_rounded,
+                                size: 14, color: AppColors.primary),
+                            const SizedBox(width: 6),
+                            const Text(
+                              '종로구',
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w900,
+                                color: AppColors.primary,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
             ),
           ),
@@ -205,29 +207,32 @@ class _NearbyMapScreenState extends State<NearbyMapScreen>
             ),
           ),
 
-          // ── Bottom Market Info Sheet ───────────────────────────
-          if (_selectedMarket != null)
-            Positioned(
-              left: 0,
-              right: 0,
-              bottom: 0,
-              child: _MarketBottomSheet(
-                market: _selectedMarket!,
-                bottomPadding: bottomPadding,
-                onClose: () => setState(() => _selectedMarket = null),
-                onNavigate: () {
-                  if (_selectedMarket!.isAvailable) {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => MarketHubScreen(
-                            marketName: _selectedMarket!.name),
-                      ),
-                    );
-                  }
-                },
-              ),
-            ),
+          // ── Fluid Market Card (V6) ──────────────────────────────
+          AnimatedPositioned(
+            duration: const Duration(milliseconds: 500),
+            curve: Curves.easeOutBack,
+            left: 16,
+            right: 16,
+            bottom: _selectedMarket != null ? (20 + bottomPadding) : -400,
+            child: _selectedMarket == null
+                ? const SizedBox.shrink()
+                : _MarketDetailCard(
+                    market: _selectedMarket!,
+                    bottomPadding: 0,
+                    onClose: () => setState(() => _selectedMarket = null),
+                    onNavigate: () {
+                      if (_selectedMarket!.isAvailable) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => MarketHubScreen(
+                                marketName: _selectedMarket!.name),
+                          ),
+                        );
+                      }
+                    },
+                  ),
+          ),
         ],
       ),
     );
@@ -478,7 +483,7 @@ class _NearbyMapPainter extends CustomPainter {
 
       // Pin body
       final pinColor = market.isAvailable
-          ? (isSelected ? AppColors.primary : const Color(0xFFE5362B))
+          ? market.accentColor
           : const Color(0xFFB0B8C4);
       canvas.drawCircle(
         Offset(cx, cy),
@@ -525,13 +530,13 @@ class _NearbyMapPainter extends CustomPainter {
 
 // ── Market Bottom Sheet ──────────────────────────────────────────────────────
 
-class _MarketBottomSheet extends StatelessWidget {
+class _MarketDetailCard extends StatelessWidget {
   final _MarketPin market;
   final double bottomPadding;
   final VoidCallback onClose;
   final VoidCallback onNavigate;
 
-  const _MarketBottomSheet({
+  const _MarketDetailCard({
     required this.market,
     required this.bottomPadding,
     required this.onClose,
@@ -545,14 +550,15 @@ class _MarketBottomSheet extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.surface,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(40)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.10),
-            blurRadius: 24,
-            offset: const Offset(0, -6),
+            color: Colors.black.withValues(alpha: 0.12),
+            blurRadius: 40,
+            offset: const Offset(0, -10),
           ),
         ],
+        border: Border.all(color: AppColors.border),
       ),
       child: SafeArea(
         top: false,
@@ -735,39 +741,50 @@ class _MarketBottomSheet extends StatelessWidget {
               // CTA button
               SizedBox(
                 width: double.infinity,
-                height: 52,
-                child: ElevatedButton(
-                  onPressed: market.isAvailable ? onNavigate : null,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: market.isAvailable
-                        ? AppColors.primary
-                        : AppColors.divider,
-                    foregroundColor:
-                        market.isAvailable ? Colors.white : AppColors.textTertiary,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    elevation: 0,
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        market.isAvailable
-                            ? Icons.map_rounded
-                            : Icons.lock_outline_rounded,
-                        size: 20,
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        market.isAvailable ? '실내 지도 보기' : '준비 중이에요',
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: -0.3,
+                height: 60,
+                child: ShrinkableButton(
+                  onTap: market.isAvailable ? onNavigate : null,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      gradient: market.isAvailable 
+                        ? LinearGradient(
+                            colors: [AppColors.primary, AppColors.primary.withValues(alpha: 0.85)],
+                          )
+                        : null,
+                      color: market.isAvailable ? null : AppColors.divider,
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: market.isAvailable ? [
+                        BoxShadow(
+                          color: AppColors.primary.withValues(alpha: 0.25),
+                          blurRadius: 20,
+                          offset: const Offset(0, 8),
                         ),
+                      ] : [],
+                    ),
+                    child: Center(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            market.isAvailable
+                                ? Icons.near_me_rounded
+                                : Icons.lock_outline_rounded,
+                            size: 22,
+                            color: market.isAvailable ? Colors.white : AppColors.textTertiary,
+                          ),
+                          const SizedBox(width: 12),
+                          Text(
+                            market.isAvailable ? '입장하기' : '준비 중이에요',
+                            style: TextStyle(
+                              fontSize: 17,
+                              fontWeight: FontWeight.w900,
+                              letterSpacing: -0.5,
+                              color: market.isAvailable ? Colors.white : AppColors.textTertiary,
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
                 ),
               ),
@@ -834,6 +851,7 @@ class _MarketPin {
   final double y;
   final bool isAvailable;
   final List<String> highlights;
+  final Color accentColor;
 
   const _MarketPin({
     required this.name,
@@ -846,5 +864,6 @@ class _MarketPin {
     required this.y,
     required this.isAvailable,
     required this.highlights,
+    required this.accentColor,
   });
 }

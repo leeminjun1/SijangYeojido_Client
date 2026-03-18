@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import '../../models/models.dart';
 import '../../data/mock_data.dart';
 import '../../theme/app_colors.dart';
+import '../../theme/sijang_design_system.dart';
 import '../../widgets/shrinkable_button.dart';
 import '../../widgets/premium_placeholder.dart';
 import '../../widgets/app_ui.dart';
@@ -31,6 +32,7 @@ class _MarketHubScreenState extends State<MarketHubScreen> {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
+    final market = MockData.getMarket(widget.marketName);
     return Scaffold(
       backgroundColor: AppColors.background,
       body: CustomScrollView(
@@ -80,84 +82,90 @@ class _MarketHubScreenState extends State<MarketHubScreen> {
                   );
                 },
               ),
-              background: Stack(
-                fit: StackFit.expand,
-                children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          AppColors.primary,
-                          AppColors.accent,
-                        ],
+              background: Hero(
+                tag: 'market_${widget.marketName}',
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [
+                            market.accentColor,
+                            market.accentColor.withValues(alpha: 0.8),
+                          ],
+                        ),
+                      ),
+                      child: const Center(
+                        child: Icon(Icons.storefront_rounded, size: 80, color: Colors.white24),
                       ),
                     ),
-                    child: const Center(
-                      child: Icon(Icons.storefront_rounded, size: 80, color: Colors.white24),
-                    ),
-                  ),
-                  // Bottom title for Expanded state
-                  Align(
-                    alignment: Alignment.bottomLeft,
-                    child: Padding(
-                      padding: const EdgeInsets.all(20),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(100),
-                                ),
-                                child: const Text(
-                                  '📍 핫플레이스',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w800,
-                                    color: AppColors.primary,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 6),
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withValues(alpha: 0.2),
-                                  borderRadius: BorderRadius.circular(100),
-                                ),
-                                child: Text(
-                                  '${MockData.stores.where((s) => s.status == StoreStatus.open).length}곳 영업 중',
-                                  style: const TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w800,
+                    // Bottom title for Expanded state
+                    Align(
+                      alignment: Alignment.bottomLeft,
+                      child: Padding(
+                        padding: const EdgeInsets.all(20),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                  decoration: BoxDecoration(
                                     color: Colors.white,
+                                    borderRadius: BorderRadius.circular(100),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      const Text('📍', style: TextStyle(fontSize: 14)),
+                                      const SizedBox(width: 6),
+                                      Text(
+                                        '핫플레이스',
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w900,
+                                          color: market.accentColor,
+                                          letterSpacing: 0.5,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
-                              ),
-                              const SizedBox(width: 6),
-                            ],
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            widget.marketName,
-                            style: textTheme.displayLarge?.copyWith(
-                              fontWeight: FontWeight.w900,
-                              color: Colors.white,
-                              letterSpacing: -1.0,
-                              height: 1.1,
+                                const SizedBox(width: 8),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                  decoration: SDS.glassDecoration(opacity: 0.2, blur: 8),
+                                  child: Text(
+                                    '${MockData.stores.where((s) => s.status == StoreStatus.open).length}곳 영업 중',
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w800,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
-                          ),
-                        ],
+                            const SizedBox(height: 8),
+                            Text(
+                              widget.marketName,
+                              style: textTheme.displayLarge?.copyWith(
+                                fontWeight: FontWeight.w900,
+                                color: Colors.white,
+                                letterSpacing: -1.0,
+                                height: 1.1,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
@@ -192,7 +200,7 @@ class _MarketHubScreenState extends State<MarketHubScreen> {
                         child: _QuickActionButton(
                           icon: Icons.map_rounded,
                           label: '실내 지도 보기',
-                          color: AppColors.primary,
+                          color: market.accentColor,
                           onTap: () {
                             // Opens the old map view as a modal/tool
                             Navigator.push(
@@ -293,48 +301,6 @@ class _MarketHubScreenState extends State<MarketHubScreen> {
   }
 }
 
-class _QuickActionButton extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final Color color;
-  final VoidCallback onTap;
-
-  const _QuickActionButton({
-    required this.icon,
-    required this.label,
-    required this.color,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return ShrinkableButton(
-      onTap: onTap,
-      child: Container(
-        height: 84,
-        decoration: BoxDecoration(
-          color: color.withValues(alpha: 0.08),
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, color: color, size: 28),
-            const SizedBox(height: 6),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w700,
-                color: color,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
 
 class _StickyCategoryDelegate extends SliverPersistentHeaderDelegate {
   final List<String> categories;
@@ -422,17 +388,12 @@ class _StoreFeedCard extends StatelessWidget {
       },
       shrinkScale: 0.98, // Subtler shrink for large cards
       child: Container(
+        margin: const EdgeInsets.only(bottom: SDS.spaceM),
         decoration: BoxDecoration(
           color: AppColors.surface,
-          borderRadius: BorderRadius.circular(28),
-          boxShadow: const [
-            BoxShadow(
-              color: AppColors.cardShadow,
-              blurRadius: 20,
-              offset: Offset(0, 6),
-              spreadRadius: 0,
-            ),
-          ],
+          borderRadius: BorderRadius.circular(SDS.radiusM),
+          boxShadow: SDS.shadowSoft,
+          border: Border.all(color: AppColors.border.withValues(alpha: 0.5)),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -621,6 +582,52 @@ class _MiniInfoChip extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+
+class _QuickActionButton extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final Color color;
+  final VoidCallback onTap;
+
+  const _QuickActionButton({
+    required this.icon,
+    required this.label,
+    required this.color,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ShrinkableButton(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 20),
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.06),
+          borderRadius: BorderRadius.circular(SDS.radiusM),
+          border: Border.all(color: color.withValues(alpha: 0.12), width: 1.5),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, size: 24, color: color),
+            const SizedBox(width: 12),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w900,
+                color: color,
+                letterSpacing: -0.5,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

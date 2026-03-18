@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../theme/app_colors.dart';
-import '../../widgets/app_ui.dart';
+
 
 class MarketInfoScreen extends StatelessWidget {
   const MarketInfoScreen({super.key});
@@ -50,36 +50,39 @@ class MarketInfoScreen extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
           decoration: BoxDecoration(
             color: AppColors.primary.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(100),
           ),
           child: const Text(
             'SINCE 1970',
             style: TextStyle(
               color: AppColors.primary,
               fontWeight: FontWeight.w900,
-              fontSize: 12,
-              letterSpacing: 1.0,
+              fontSize: 11,
+              letterSpacing: 1.5,
             ),
           ),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 24),
         Text(
           '서울에서 가장 활기찬\n전통 시장, 시장여지도',
           style: textTheme.displaySmall?.copyWith(
             fontWeight: FontWeight.w900,
             color: AppColors.textPrimary,
-            height: 1.2,
+            height: 1.1,
+            letterSpacing: -1.5,
           ),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 20),
         Text(
           '350여 개의 점포가 함께하며, 신선한 수산물부터 맛있는 먹거리까지 최고의 품질을 약속합니다.',
           style: textTheme.bodyLarge?.copyWith(
             color: AppColors.textSecondary,
             height: 1.6,
+            fontWeight: FontWeight.w600,
+            letterSpacing: -0.2,
           ),
         ),
       ],
@@ -116,25 +119,35 @@ class MarketInfoScreen extends StatelessWidget {
             return Container(
               decoration: BoxDecoration(
                 color: AppColors.surface,
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(28),
+                border: Border.all(color: AppColors.border.withValues(alpha: 0.5)),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.02),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
+                    color: Colors.black.withValues(alpha: 0.03),
+                    blurRadius: 20,
+                    offset: const Offset(0, 6),
                   ),
                 ],
               ),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(f['icon'] as IconData, color: AppColors.primary, size: 28),
-                  const SizedBox(height: 8),
+                  Container(
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withValues(alpha: 0.05),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(f['icon'] as IconData, color: AppColors.primary, size: 24),
+                  ),
+                  const SizedBox(height: 10),
                   Text(
                     f['label'] as String,
                     style: textTheme.labelSmall?.copyWith(
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.textSecondary,
+                      fontWeight: FontWeight.w800,
+                      color: AppColors.textPrimary,
+                      fontSize: 11,
                     ),
                   ),
                 ],
@@ -227,33 +240,50 @@ class MarketInfoScreen extends StatelessWidget {
 
   Widget _buildInfoCard(TextTheme textTheme, IconData icon, String title, String detail) {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         color: AppColors.surface,
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(32),
+        border: Border.all(color: AppColors.border.withValues(alpha: 0.8)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
+          ),
+        ],
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, color: AppColors.textTertiary, size: 24),
-          const SizedBox(width: 16),
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: AppColors.background,
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Icon(icon, color: AppColors.primary, size: 22),
+          ),
+          const SizedBox(width: 18),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   title,
-                  style: textTheme.titleSmall?.copyWith(
-                    fontWeight: FontWeight.w800,
+                  style: textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w900,
                     color: AppColors.textPrimary,
+                    letterSpacing: -0.5,
                   ),
                 ),
-                const SizedBox(height: 6),
+                const SizedBox(height: 8),
                 Text(
                   detail,
                   style: textTheme.bodyMedium?.copyWith(
                     color: AppColors.textSecondary,
-                    height: 1.5,
+                    height: 1.6,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ],

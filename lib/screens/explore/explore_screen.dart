@@ -18,6 +18,7 @@ class ExploreScreen extends StatefulWidget {
 
 class _ExploreScreenState extends State<ExploreScreen> {
   String _selectedCategory = '전체';
+  final String _searchQuery = '';
 
   final List<String> _categories = ['전체', '먹거리', '생선/해산물', '청과/야채', '포목/직물'];
 
