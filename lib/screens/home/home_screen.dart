@@ -5,6 +5,7 @@ import '../../models/models.dart';
 import '../../theme/app_colors.dart';
 import '../../widgets/shrinkable_button.dart';
 import 'package:sijangyeojido_client/screens/map/market_hub_screen.dart';
+import '../../widgets/skeleton.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -15,12 +16,18 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   late Timer _timer;
+  bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
     _timer = Timer.periodic(const Duration(seconds: 30), (_) {
       if (mounted) setState(() {});
+    });
+    
+    // Simulate initial loading
+    Future.delayed(const Duration(milliseconds: 1500), () {
+      if (mounted) setState(() => _isLoading = false);
     });
   }
 
@@ -202,25 +209,33 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
 
-          // ── Markets List ───────────────────────────────────────
           SliverPadding(
             padding: EdgeInsets.fromLTRB(20, 12, 20, bottomPadding + 100),
-            sliver: SliverList(
-              delegate: SliverChildBuilderDelegate(
-                (context, index) {
-                  final market = _mockMarkets[index];
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 14),
-                    child: _MarketCard(
-                      market: market,
-                      dealCount: 0,
-                      openStoreCount: market.isAvailable ? openCount : 0,
+            sliver: _isLoading 
+                ? SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (context, index) => const Padding(
+                        padding: EdgeInsets.only(bottom: 14),
+                        child: Skeleton(height: 160, borderRadius: 28),
+                      ),
+                      childCount: 3,
                     ),
-                  );
-                },
-                childCount: _mockMarkets.length,
-              ),
-            ),
+                  )
+                : SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (context, index) {
+                        final market = _mockMarkets[index];
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 14),
+                          child: _MarketCard(
+                            market: market,
+                            openStoreCount: market.isAvailable ? openCount : 0,
+                          ),
+                        );
+                      },
+                      childCount: _mockMarkets.length,
+                    ),
+                  ),
           ),
         ],
       ),
@@ -230,12 +245,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
 class _MarketCard extends StatelessWidget {
   final _MarketInfo market;
-  final int dealCount;
   final int openStoreCount;
 
   const _MarketCard({
     required this.market,
-    required this.dealCount,
     required this.openStoreCount,
   });
 
@@ -343,13 +356,6 @@ class _MarketCard extends StatelessWidget {
                           label: '$openStoreCount곳 영업 중',
                           color: AppColors.success,
                         ),
-                        const SizedBox(width: 10),
-                        if (dealCount > 0)
-                          _MiniStat(
-                            icon: Icons.local_offer_rounded,
-                            label: '특가 $dealCount건',
-                            color: AppColors.primary,
-                          ),
                       ],
                     ),
                     const SizedBox(height: 10),

@@ -17,7 +17,7 @@ class MarketMapScreen extends StatefulWidget {
   State<MarketMapScreen> createState() => _MarketMapScreenState();
 }
 
-class _MarketMapScreenState extends State<MarketMapScreen> {
+class _MarketMapScreenState extends State<MarketMapScreen> with SingleTickerProviderStateMixin {
   String? _selectedStoreId;
   String _searchQuery = '';
   bool _filterOpen = false;
@@ -28,6 +28,9 @@ class _MarketMapScreenState extends State<MarketMapScreen> {
 
   final _searchController = TextEditingController();
   final _sheetController = DraggableScrollableController();
+  late TransformationController _transformationController;
+  late AnimationController _animationController;
+  Animation<Matrix4>? _mapAnimation;
   Size _mapSize = Size.zero;
 
   static const _categories = ['전체', '먹거리', '생선·해산물', '청과·야채', '포목·직물'];
@@ -75,13 +78,28 @@ class _MarketMapScreenState extends State<MarketMapScreen> {
       selectedStoreId: _selectedStoreId,
       routeTargetStoreId: _routeTargetStoreId,
     );
+    
+    // Account for current transformation
+    final RenderBox box = context.findRenderObject() as RenderBox;
+    final localPos = box.globalToLocal(details.globalPosition);
+    // Actually, InteractiveViewer child receives local coordinates if we use the right point.
+    // But since GestureDetector is inside, it should be fine.
+    
     final tappedStore = painter.storeAtPosition(details.localPosition, _mapSize);
     if (tappedStore != null) {
-      setState(() => _selectedStoreId = tappedStore.id);
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (_) => StoreDetailScreen(store: tappedStore)),
-      ).then((_) => setState(() => _selectedStoreId = null));
+      setState(() {
+        _selectedStoreId = tappedStore.id;
+        _routeTargetStoreId = tappedStore.id;
+      });
+      _animateToStore(tappedStore);
+      
+      Future.delayed(const Duration(milliseconds: 400), () {
+        if (!mounted) return;
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => StoreDetailScreen(store: tappedStore)),
+        ).then((_) => setState(() => _selectedStoreId = null));
+      });
     } else {
       setState(() => _selectedStoreId = null);
       if (_sheetController.isAttached) {
@@ -92,6 +110,29 @@ class _MarketMapScreenState extends State<MarketMapScreen> {
         );
       }
     }
+  }
+
+  void _animateToStore(Store store) {
+    if (_mapSize == Size.zero) return;
+
+    final double targetX = store.offset.dx * _mapSize.width;
+    final double targetY = store.offset.dy * _mapSize.height;
+    const double targetScale = 2.5;
+
+    final Matrix4 endMatrix = Matrix4.identity()
+      ..translate(_mapSize.width / 2, _mapSize.height / 2)
+      ..scale(targetScale)
+      ..translate(-targetX, -targetY);
+
+    _mapAnimation = Matrix4Tween(
+      begin: _transformationController.value,
+      end: endMatrix,
+    ).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeOutCubic,
+    ));
+
+    _animationController.forward(from: 0);
   }
 
   void _resetAll() {
@@ -110,7 +151,23 @@ class _MarketMapScreenState extends State<MarketMapScreen> {
   void dispose() {
     _searchController.dispose();
     _sheetController.dispose();
+    _animationController.dispose();
+    _transformationController.dispose();
     super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _transformationController = TransformationController();
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
+    )..addListener(() {
+        if (_mapAnimation != null) {
+          _transformationController.value = _mapAnimation!.value;
+        }
+      });
   }
 
   @override
@@ -126,6 +183,7 @@ class _MarketMapScreenState extends State<MarketMapScreen> {
           // ── Full-screen map ──────────────────────────────────────
           Positioned.fill(
             child: InteractiveViewer(
+              transformationController: _transformationController,
               minScale: 1.0,
               maxScale: 4.0,
               boundaryMargin: const EdgeInsets.all(20),
@@ -441,10 +499,15 @@ class _MarketMapScreenState extends State<MarketMapScreen> {
                                   onTap: () {
                                     setState(() {
                                       _selectedStoreId = store.id;
-                                      _routeTargetStoreId =
-                                          store.id; // Also set route
+                                      _routeTargetStoreId = store.id;
                                     });
-                                    StoreBottomSheet.show(context, store);
+                                    _animateToStore(store);
+                                    if (_sheetController.isAttached) {
+                                      _sheetController.animateTo(0.1, duration: const Duration(milliseconds: 300), curve: Curves.easeIn);
+                                    }
+                                    Future.delayed(const Duration(milliseconds: 500), () {
+                                      if (mounted) StoreBottomSheet.show(context, store);
+                                    });
                                   },
                                 );
                               },

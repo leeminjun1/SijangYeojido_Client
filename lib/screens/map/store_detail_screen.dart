@@ -133,22 +133,58 @@ class StoreDetailScreen extends StatelessWidget {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 14),
-                    Text(
-                      store.name,
-                      style: textTheme.displayMedium?.copyWith(
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: -0.8,
-                        height: 1.15,
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      store.category,
-                      style: textTheme.bodyMedium?.copyWith(
-                        color: AppColors.textSecondary,
-                        fontWeight: FontWeight.w600,
-                      ),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                store.name,
+                                style: textTheme.displayMedium?.copyWith(
+                                  fontWeight: FontWeight.w900,
+                                  letterSpacing: -0.8,
+                                  height: 1.15,
+                                ),
+                              ),
+                              const SizedBox(height: 6),
+                              Text(
+                                store.category,
+                                style: textTheme.bodyMedium?.copyWith(
+                                  color: AppColors.textSecondary,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Hero(
+                          tag: 'store_image_${store.id}',
+                          child: Container(
+                            width: 80,
+                            height: 80,
+                            decoration: BoxDecoration(
+                              color: AppColors.surface,
+                              borderRadius: BorderRadius.circular(20),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: AppColors.primary.withValues(alpha: 0.1),
+                                  blurRadius: 12,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ],
+                            ),
+                            child: Center(
+                              child: Icon(
+                                _iconForCategory(store.category),
+                                size: 40,
+                                color: AppColors.primary,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 12),
                     Wrap(
@@ -381,6 +417,15 @@ class StoreDetailScreen extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  IconData _iconForCategory(String category) {
+    if (category.contains('먹거리')) return Icons.restaurant_rounded;
+    if (category.contains('수산')) return Icons.set_meal_rounded;
+    if (category.contains('정육')) return Icons.kebab_dining_rounded;
+    if (category.contains('과일') || category.contains('채소')) return Icons.eco_rounded;
+    if (category.contains('건어물')) return Icons.water_drop_rounded;
+    return Icons.storefront_rounded;
   }
 }
 

@@ -443,11 +443,14 @@ class _StoreFeedCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Icon/Image
-                  PremiumPlaceholder(
-                    category: store.category,
-                    width: 64,
-                    height: 64,
-                    borderRadius: 16,
+                  Hero(
+                    tag: 'store_image_${store.id}',
+                    child: PremiumPlaceholder(
+                      category: store.category,
+                      width: 64,
+                      height: 64,
+                      borderRadius: 16,
+                    ),
                   ),
                   const SizedBox(width: 16),
                   

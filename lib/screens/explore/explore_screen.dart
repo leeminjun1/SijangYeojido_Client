@@ -5,6 +5,8 @@ import '../../models/models.dart';
 import '../../data/mock_data.dart';
 
 import '../map/store_bottom_sheet.dart';
+import '../map/store_detail_screen.dart';
+import '../../widgets/premium_placeholder.dart';
 
 class ExploreScreen extends StatefulWidget {
   const ExploreScreen({super.key});
@@ -235,7 +237,12 @@ class _ExploreScreenState extends State<ExploreScreen> {
 
 
   void _openStore(Store store) {
-    StoreBottomSheet.show(context, store);
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => StoreDetailScreen(store: store),
+      ),
+    );
   }
 }
 
@@ -274,6 +281,16 @@ class _StoreListItem extends StatelessWidget {
           children: [
             Row(
               children: [
+                Hero(
+                  tag: 'store_image_${store.id}',
+                  child: PremiumPlaceholder(
+                    category: store.category,
+                    width: 48,
+                    height: 48,
+                    borderRadius: 10,
+                  ),
+                ),
+                const SizedBox(width: 12),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -324,7 +341,6 @@ class _StoreListItem extends StatelessWidget {
                     ],
                   ),
                 ),
-
               ],
             ),
             if (store.items.isNotEmpty) ...[

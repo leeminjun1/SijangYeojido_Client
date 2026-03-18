@@ -4,14 +4,14 @@ import 'package:flutter/material.dart';
 /// when pressed, similar to iOS or Toss buttons.
 class ShrinkableButton extends StatefulWidget {
   final Widget child;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
   final double shrinkScale;
   final Duration duration;
 
   const ShrinkableButton({
     super.key,
     required this.child,
-    required this.onTap,
+    this.onTap,
     this.shrinkScale = 0.96, // Slight, elegant shrink
     this.duration = const Duration(milliseconds: 100),
   });
@@ -46,7 +46,7 @@ class _ShrinkableButtonState extends State<ShrinkableButton>
 
   void _onTapUp(TapUpDetails details) {
     _controller.reverse();
-    widget.onTap();
+    widget.onTap?.call();
   }
 
   void _onTapCancel() {

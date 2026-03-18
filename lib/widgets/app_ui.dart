@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
+import 'shrinkable_button.dart';
 
 /// 공통 섹션 헤더 (타이틀 + 선택적 서브타이틀/우측 액션)
 class AppSectionHeader extends StatelessWidget {
@@ -99,9 +100,9 @@ class AppCard extends StatelessWidget {
 
     if (onTap == null) return card;
 
-    return InkWell(
-      borderRadius: BorderRadius.circular(20),
+    return ShrinkableButton(
       onTap: onTap,
+      shrinkScale: 0.98,
       child: card,
     );
   }
@@ -120,11 +121,14 @@ class AppPrimaryButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton(
-        onPressed: onPressed,
-        child: Text(label),
+    return ShrinkableButton(
+      onTap: onPressed,
+      child: SizedBox(
+        width: double.infinity,
+        child: ElevatedButton(
+          onPressed: onPressed,
+          child: Text(label),
+        ),
       ),
     );
   }
