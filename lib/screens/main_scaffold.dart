@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import '../theme/app_colors.dart';
-import '../widgets/shrinkable_button.dart';
+import '../widgets/sds_widgets.dart';
 import 'home/home_screen.dart';
 import 'home/nearby_map_screen.dart';
 import 'reservation/reservation_list_screen.dart';
@@ -32,111 +31,48 @@ class _MainScaffoldState extends State<MainScaffold> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: IndexedStack(
-        index: _currentIndex,
-        children: _screens,
-      ),
-      bottomNavigationBar: Container(
-        decoration: BoxDecoration(
-          color: AppColors.surface,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
-              blurRadius: 30,
-              offset: const Offset(0, -10),
-            ),
-          ],
-          border: Border(
-            top: BorderSide(color: AppColors.border.withValues(alpha: 0.5), width: 0.5),
+      extendBody: true,
+      body: Stack(
+        children: [
+          IndexedStack(
+            index: _currentIndex,
+            children: _screens.map((screen) => Padding(
+              padding: const EdgeInsets.only(bottom: 80), // Space for floating tabbar
+              child: screen,
+            )).toList(),
           ),
-        ),
-        child: SafeArea(
-          child: SizedBox(
-            height: 64,
-            child: Row(
-              children: [
-                _NavItem(
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 20,
+            child: SDSFloatingTabbar(
+              currentIndex: _currentIndex,
+              onTap: (index) => setState(() => _currentIndex = index),
+              items: const [
+                SDSFloatingTabItem(
                   icon: Icons.home_rounded,
                   activeIcon: Icons.home_rounded,
                   label: '홈',
-                  isSelected: _currentIndex == 0,
-                  onTap: () => setState(() => _currentIndex = 0),
                 ),
-                _NavItem(
+                SDSFloatingTabItem(
                   icon: Icons.location_on_outlined,
                   activeIcon: Icons.location_on_rounded,
-                  label: '내 주변',
-                  isSelected: _currentIndex == 1,
-                  onTap: () => setState(() => _currentIndex = 1),
+                  label: '지도로 찾기',
                 ),
-                _NavItem(
+                SDSFloatingTabItem(
                   icon: Icons.receipt_long_outlined,
                   activeIcon: Icons.receipt_long_rounded,
-                  label: '진행중',
-                  isSelected: _currentIndex == 2,
-                  onTap: () => setState(() => _currentIndex = 2),
+                  label: '주문 내역',
                 ),
-                _NavItem(
+                SDSFloatingTabItem(
                   icon: Icons.person_outline_rounded,
                   activeIcon: Icons.person_rounded,
-                  label: '마이',
-                  isSelected: _currentIndex == 3,
-                  onTap: () => setState(() => _currentIndex = 3),
+                  label: '내 정보',
                 ),
               ],
             ),
           ),
-        ),
-      ),
-    );
-  }
-}
-
-class _NavItem extends StatelessWidget {
-  final IconData icon;
-  final IconData activeIcon;
-  final String label;
-  final bool isSelected;
-  final VoidCallback onTap;
-
-  const _NavItem({
-    required this.icon,
-    required this.activeIcon,
-    required this.label,
-    required this.isSelected,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      child: ShrinkableButton(
-        onTap: onTap,
-        shrinkScale: 0.9,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              isSelected ? activeIcon : icon,
-              color: isSelected
-                  ? AppColors.primary
-                  : AppColors.textTertiary,
-              size: 26,
-            ),
-            const SizedBox(height: 5),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 10,
-                fontWeight: isSelected ? FontWeight.w900 : FontWeight.w700,
-                color: isSelected
-                    ? AppColors.primary
-                    : AppColors.textTertiary,
-                letterSpacing: -0.5,
-              ),
-            ),
-          ],
-        ),
+        ],
       ),
     );
   }

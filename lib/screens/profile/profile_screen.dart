@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import '../../theme/app_colors.dart';
 import '../../data/mock_data.dart';
+import '../../theme/sijang_design_system.dart';
+import '../../widgets/sds_widgets.dart';
+import '../../widgets/shrinkable_button.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -15,18 +18,11 @@ class ProfileScreen extends StatelessWidget {
       backgroundColor: AppColors.background,
       body: CustomScrollView(
         slivers: [
-          SliverAppBar(
-            floating: true,
-            backgroundColor: AppColors.background,
-            elevation: 0,
-            centerTitle: false,
-            title: Text(
-              '마이',
-              style: textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.w900,
-                color: AppColors.textPrimary,
-                letterSpacing: -1.0,
-              ),
+          SliverToBoxAdapter(
+            child: SDS.topBar(
+              context: context,
+              title: '내 정보',
+              subtitle: '반가워요, 김시장님! 오늘도 활기찬 하루 되세요 ✨',
             ),
           ),
           SliverToBoxAdapter(
@@ -77,99 +73,104 @@ class ProfileScreen extends StatelessWidget {
 class _ProfileHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
-    return Container(
-      margin: const EdgeInsets.fromLTRB(20, 12, 20, 0),
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            AppColors.primary.withValues(alpha: 0.12),
-            AppColors.accent.withValues(alpha: 0.05),
-            AppColors.surface,
-          ],
+    return SDSFadeIn(
+      child: Container(
+        margin: const EdgeInsets.fromLTRB(20, 12, 20, 0),
+        padding: EdgeInsets.all(SDS.space24),
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(SDS.radiusL),
+          boxShadow: SDS.shadowPremium,
+          border: Border.all(color: AppColors.primary.withValues(alpha: 0.05)),
         ),
-        borderRadius: BorderRadius.circular(32),
-        border: Border.all(color: AppColors.primary.withValues(alpha: 0.05)),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.primary.withValues(alpha: 0.1),
-            blurRadius: 30,
-            offset: const Offset(0, 10),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 60,
-            height: 60,
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xFFE5362B), Color(0xFFFF6B35)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
+        child: Row(
+          children: [
+            Container(
+              width: 64,
+              height: 64,
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [Color(0xFFE5362B), Color(0xFFFF6B35)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFFE5362B).withValues(alpha: 0.2),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
               ),
-              shape: BoxShape.circle,
-            ),
-            child: const Center(
-              child: Text(
-                '김',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.w800,
-                  color: Colors.white,
+              child: const Center(
+                child: Text(
+                  '김',
+                  style: TextStyle(
+                    fontSize: 26,
+                    fontWeight: SDS.fwBlack,
+                    color: Colors.white,
+                  ),
                 ),
               ),
             ),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '김시장',
-                  style: textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.w800,
-                    color: AppColors.textPrimary,
-                  ),
-                ),
-                const SizedBox(height: 3),
-                Text(
-                  '시장 단골 회원',
-                  style: textTheme.bodySmall?.copyWith(
-                    color: AppColors.textSecondary,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
-                  decoration: BoxDecoration(
-                    color: AppColors.primaryLight,
-                    borderRadius: BorderRadius.circular(100),
-                  ),
-                  child: const Text(
-                    '2026년 1월부터 함께',
+            const SizedBox(width: 20),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '김시장님',
                     style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.primary,
+                      fontSize: 20,
+                      fontWeight: SDS.fwBlack,
+                      color: AppColors.textPrimary,
                     ),
                   ),
-                ),
-              ],
+                  const SizedBox(height: 4),
+                  Text(
+                    '여지도와 함께한 지 3개월째예요',
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: SDS.fwBold,
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.edit_outlined,
-                size: 20, color: AppColors.textTertiary),
-          ),
-        ],
+            _ActionIconBtn(
+              icon: Icons.settings_rounded,
+              onTap: () {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('환경 설정을 준비하고 있어요!')),
+                );
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ActionIconBtn extends StatelessWidget {
+  final IconData icon;
+  final VoidCallback onTap;
+  const _ActionIconBtn({required this.icon, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return ShrinkableButton(
+      onTap: onTap,
+      child: Container(
+        width: 40,
+        height: 40,
+        decoration: BoxDecoration(
+          color: const Color(0xFFF2F4F6),
+          shape: BoxShape.circle,
+        ),
+        child: Icon(icon, size: 20, color: AppColors.textSecondary),
       ),
     );
   }
@@ -210,31 +211,26 @@ class _StatCard extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 20),
         decoration: BoxDecoration(
           color: AppColors.surface,
-          borderRadius: BorderRadius.circular(24),
-          border: Border.all(color: AppColors.border.withValues(alpha: 0.5)),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.03),
-              blurRadius: 20,
-              offset: const Offset(0, 6),
-            ),
-          ],
+          borderRadius: BorderRadius.circular(SDS.radiusM),
+          boxShadow: SDS.shadowSoft,
+          border: Border.all(color: AppColors.border.withValues(alpha: 0.3)),
         ),
         child: Column(
           children: [
             Text(
               value,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 22,
-                fontWeight: FontWeight.w800,
+                fontWeight: SDS.fwBlack,
                 color: AppColors.textPrimary,
               ),
             ),
-            const SizedBox(height: 2),
+            const SizedBox(height: 4),
             Text(
               label,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 12,
+                fontWeight: SDS.fwBold,
                 color: AppColors.textTertiary,
               ),
             ),
@@ -274,61 +270,22 @@ class _MarketTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      child: Container(
-        padding: const EdgeInsets.all(14),
+    return SDS.listRow(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+      leading: Container(
+        width: 44,
+        height: 44,
         decoration: BoxDecoration(
-          color: AppColors.background,
-          borderRadius: BorderRadius.circular(16),
+          color: AppColors.primary.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(SDS.radiusS),
         ),
-        child: Row(
-          children: [
-            Container(
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(
-                color: AppColors.primaryLight,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: const Icon(Icons.storefront,
-                  color: AppColors.primary, size: 22),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    name,
-                    style: const TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.textPrimary,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    address,
-                    style: const TextStyle(
-                        fontSize: 12, color: AppColors.textTertiary),
-                  ),
-                ],
-              ),
-            ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Text(
-                  '점포 $storeCount',
-                  style: const TextStyle(
-                      fontSize: 12, color: AppColors.textSecondary),
-                ),
-
-              ],
-            ),
-          ],
-        ),
+        child: const Icon(Icons.storefront_rounded, color: AppColors.primary, size: 22),
+      ),
+      title: Text(name),
+      subtitle: Text(address),
+      trailing: Text(
+        '점포 $storeCount개',
+        style: TextStyle(fontSize: 12, fontWeight: SDS.fwBold, color: AppColors.textSecondary),
       ),
     );
   }
@@ -344,24 +301,40 @@ class _SettingsSection extends StatelessWidget {
           icon: Icons.notifications_outlined,
           label: '알림 설정',
           subtitle: '푸시 알림, 야간 제한',
-          onTap: () {},
+          onTap: () {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('알림 설정 페이지로 이동합니다.')),
+            );
+          },
         ),
         _SettingItem(
           icon: Icons.location_on_outlined,
           label: '반경 설정',
           subtitle: '현재 1km',
-          onTap: () {},
+          onTap: () {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('주변 탐색 반경을 설정합니다.')),
+            );
+          },
         ),
         _SettingItem(
           icon: Icons.shield_outlined,
           label: '개인정보 처리방침',
-          onTap: () {},
+          onTap: () {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('개인정보 처리방침을 불러옵니다.')),
+            );
+          },
         ),
         _SettingItem(
           icon: Icons.info_outline,
           label: '앱 정보',
           subtitle: 'v1.0.0',
-          onTap: () {},
+          onTap: () {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('시장여지도 v1.0.0 (최신 버전입니다)')),
+            );
+          },
         ),
         _SettingItem(
           icon: Icons.flag_outlined,
@@ -377,53 +350,32 @@ class _SettingItem extends StatelessWidget {
   final IconData icon;
   final String label;
   final String? subtitle;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
 
   const _SettingItem({
     required this.icon,
     required this.label,
     this.subtitle,
-    required this.onTap,
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-        decoration: const BoxDecoration(
-          border: Border(
-            bottom: BorderSide(color: AppColors.divider),
-          ),
+    return SDS.listRow(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+      leading: Container(
+        width: 40,
+        height: 40,
+        decoration: BoxDecoration(
+          color: const Color(0xFFF2F4F6),
+          borderRadius: BorderRadius.circular(SDS.radiusS),
         ),
-        child: Row(
-          children: [
-            Icon(icon, size: 20, color: AppColors.textSecondary),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Text(
-                label,
-                style: const TextStyle(
-                  fontSize: 15,
-                  color: AppColors.textPrimary,
-                ),
-              ),
-            ),
-            if (subtitle != null)
-              Text(
-                subtitle!,
-                style: const TextStyle(
-                  fontSize: 13,
-                  color: AppColors.textTertiary,
-                ),
-              ),
-            const SizedBox(width: 6),
-            const Icon(Icons.chevron_right,
-                size: 18, color: AppColors.textTertiary),
-          ],
-        ),
+        child: Icon(icon, size: 20, color: AppColors.textSecondary),
       ),
+      title: Text(label),
+      subtitle: subtitle != null ? Text(subtitle!) : null,
+      trailing: const Icon(Icons.chevron_right_rounded, size: 20, color: AppColors.textTertiary),
+      onTap: onTap,
     );
   }
 }
@@ -440,31 +392,31 @@ class _Section extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+          padding: const EdgeInsets.fromLTRB(24, 24, 24, 12),
           child: Text(
             title,
-            style: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w700,
-              color: AppColors.textPrimary,
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: SDS.fwBlack,
+              color: AppColors.textTertiary,
+              letterSpacing: 0.5,
             ),
           ),
         ),
         Container(
-          margin: const EdgeInsets.symmetric(horizontal: 16),
+          margin: const EdgeInsets.symmetric(horizontal: 20),
           decoration: BoxDecoration(
             color: AppColors.surface,
-            borderRadius: BorderRadius.circular(28),
-            border: Border.all(color: AppColors.border.withValues(alpha: 0.8)),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.04),
-                blurRadius: 30,
-                offset: const Offset(0, 10),
-              ),
+            borderRadius: BorderRadius.circular(SDS.radiusL),
+            boxShadow: SDS.shadowPremium,
+            border: Border.all(color: AppColors.border.withValues(alpha: 0.3)),
+          ),
+          child: Column(
+            children: [
+              ...children,
+              const SizedBox(height: 8),
             ],
           ),
-          child: Column(children: children),
         ),
       ],
     );

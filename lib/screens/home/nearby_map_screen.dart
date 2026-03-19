@@ -142,11 +142,11 @@ class _NearbyMapScreenState extends State<NearbyMapScreen>
                           size: 24, color: AppColors.primary),
                       const SizedBox(width: 16),
                       Text(
-                        '어느 시장으로 갈까요?',
+                        '어느 시장으로 안내해 드릴까요?',
                         style: TextStyle(
                           fontSize: 16,
-                          fontWeight: FontWeight.w800,
-                          color: AppColors.textTertiary,
+                          fontWeight: SDS.fwBlack,
+                          color: AppColors.textPrimary,
                           letterSpacing: -0.5,
                         ),
                       ),
@@ -216,7 +216,7 @@ class _NearbyMapScreenState extends State<NearbyMapScreen>
             curve: Curves.easeOutBack,
             left: 16,
             right: 16,
-            bottom: _selectedMarket != null ? (20 + bottomPadding) : -400,
+            bottom: _selectedMarket != null ? (100 + bottomPadding) : -400,
             child: _selectedMarket == null
                 ? const SizedBox.shrink()
                 : _MarketDetailCard(
@@ -585,15 +585,9 @@ class _MarketDetailCard extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.surface,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(40)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.12),
-            blurRadius: 40,
-            offset: const Offset(0, -10),
-          ),
-        ],
-        border: Border.all(color: AppColors.border),
+        borderRadius: BorderRadius.circular(SDS.radiusXL),
+        boxShadow: SDS.shadowPremium,
+        border: Border.all(color: AppColors.border.withValues(alpha: 0.5)),
       ),
       child: SafeArea(
         top: false,
@@ -606,11 +600,11 @@ class _MarketDetailCard extends StatelessWidget {
               // Handle bar
               Center(
                 child: Container(
-                  width: 36,
+                  width: 40,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: AppColors.border,
-                    borderRadius: BorderRadius.circular(100),
+                    color: const Color(0xFFE5E8EB),
+                    borderRadius: BorderRadius.circular(SDS.radiusCapsule),
                   ),
                 ),
               ),
@@ -627,8 +621,9 @@ class _MarketDetailCard extends StatelessWidget {
                           children: [
                             Text(
                               market.name,
-                              style: textTheme.headlineSmall?.copyWith(
-                                fontWeight: FontWeight.w900,
+                              style: TextStyle(
+                                fontSize: 22,
+                                fontWeight: SDS.fwBlack,
                                 letterSpacing: -0.5,
                                 color: AppColors.textPrimary,
                               ),
@@ -834,10 +829,10 @@ class _MarketDetailCard extends StatelessWidget {
                           ),
                           const SizedBox(width: 12),
                           Text(
-                            market.isAvailable ? '입장하기' : '준비 중이에요',
+                            market.isAvailable ? '이 시장 구경할까요?' : '아직 준비 중이에요',
                             style: TextStyle(
                               fontSize: 17,
-                              fontWeight: FontWeight.w900,
+                              fontWeight: SDS.fwBlack,
                               letterSpacing: -0.5,
                               color: market.isAvailable ? Colors.white : AppColors.textTertiary,
                             ),

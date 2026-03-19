@@ -5,6 +5,8 @@ import '../../theme/app_colors.dart';
 import '../../widgets/app_ui.dart';
 import '../../widgets/shrinkable_button.dart';
 import '../map/store_detail_screen.dart';
+import '../../theme/sijang_design_system.dart';
+import '../../widgets/sds_widgets.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});
@@ -48,52 +50,60 @@ class _SearchScreenState extends State<SearchScreen> {
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        backgroundColor: AppColors.surface,
-        elevation: 0,
-        leading: ShrinkableButton(
-          onTap: () => Navigator.pop(context),
-          child: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
-        ),
-        title: Container(
-          height: 48,
-          decoration: BoxDecoration(
-            color: AppColors.background,
-            borderRadius: BorderRadius.circular(16),
+      body: Column(
+        children: [
+          SDS.topBar(
+            context: context,
+            title: '시장 검색',
+            subtitle: '찾으시는 시장 또는 가게를 입력해 주세요 🏛️',
           ),
-          child: TextField(
-            controller: _searchController,
-            autofocus: true,
-            onChanged: _onSearch,
-            decoration: InputDecoration(
-              hintText: '가게, 품목, 구역 검색',
-              hintStyle: textTheme.bodyLarge?.copyWith(
-                color: AppColors.textTertiary,
-                fontWeight: FontWeight.w600,
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+            child: Container(
+              height: 52,
+              decoration: BoxDecoration(
+                color: AppColors.surface,
+                borderRadius: BorderRadius.circular(SDS.radiusS),
+                boxShadow: SDS.shadowSoft,
+                border: Border.all(color: AppColors.border.withValues(alpha: 0.5)),
               ),
-              prefixIcon: const Icon(Icons.search_rounded, color: AppColors.primary),
-              suffixIcon: _searchController.text.isNotEmpty 
-                ? IconButton(
-                    icon: const Icon(Icons.cancel_rounded, color: AppColors.textTertiary),
-                    onPressed: () {
-                      _searchController.clear();
-                      _onSearch('');
-                    },
-                  )
-                : null,
-              border: InputBorder.none,
-              contentPadding: const EdgeInsets.symmetric(vertical: 11),
-            ),
-            style: textTheme.bodyLarge?.copyWith(
-              fontWeight: FontWeight.w700,
-              color: AppColors.textPrimary,
+              child: TextField(
+                controller: _searchController,
+                autofocus: true,
+                onChanged: _onSearch,
+                decoration: InputDecoration(
+                  hintText: '가게 이름 또는 시장 테마 검색',
+                  hintStyle: TextStyle(
+                    color: AppColors.textTertiary,
+                    fontWeight: SDS.fwBold,
+                  ),
+                  prefixIcon: const Icon(Icons.search_rounded, color: AppColors.primary),
+                  suffixIcon: _searchController.text.isNotEmpty 
+                    ? IconButton(
+                        icon: const Icon(Icons.cancel_rounded, color: AppColors.textTertiary),
+                        onPressed: () {
+                          _searchController.clear();
+                          _onSearch('');
+                        },
+                      )
+                    : null,
+                  border: InputBorder.none,
+                  contentPadding: const EdgeInsets.symmetric(vertical: 14),
+                ),
+                style: TextStyle(
+                  fontWeight: SDS.fwBlack,
+                  color: AppColors.textPrimary,
+                ),
+              ),
             ),
           ),
-        ),
+          Expanded(
+            child: _hasStartedTyped 
+                ? _buildSearchResults() 
+                : _buildSearchHome(textTheme),
+          ),
+        ],
       ),
-      body: _hasStartedTyped 
-        ? _buildSearchResults() 
-        : _buildSearchHome(textTheme),
     );
   }
 
@@ -213,58 +223,31 @@ class _SearchScreenState extends State<SearchScreen> {
     }
 
     return ListView.separated(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(vertical: 8),
       itemCount: _results.length,
-      separatorBuilder: (context, index) => const SizedBox(height: 12),
+      separatorBuilder: (context, index) => const SizedBox(height: 2),
       itemBuilder: (context, index) {
         final store = _results[index];
-        return AppCard(
+        return SDS.listRow(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          leading: Container(
+            width: 52,
+            height: 52,
+            decoration: BoxDecoration(
+              color: AppColors.primary.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(SDS.radiusS),
+            ),
+            child: Icon(_iconForCategory(store.category), color: AppColors.primary, size: 24),
+          ),
+          title: Text(store.name),
+          subtitle: Text('${store.category} · ${store.zoneId}구역'),
+          trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 14, color: AppColors.textTertiary),
           onTap: () {
             Navigator.push(
               context,
               MaterialPageRoute(builder: (_) => StoreDetailScreen(store: store)),
             );
           },
-          padding: const EdgeInsets.all(16),
-          child: Row(
-            children: [
-              Container(
-                width: 52,
-                height: 52,
-                decoration: BoxDecoration(
-                  color: AppColors.background,
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Icon(_iconForCategory(store.category), color: AppColors.primary, size: 24),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      store.name,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w800,
-                        color: AppColors.textPrimary,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      '${store.category} · ${store.zoneId}구역',
-                      style: const TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.textSecondary,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const Icon(Icons.arrow_forward_ios_rounded, size: 14, color: AppColors.textTertiary),
-            ],
-          ),
         );
       },
     );

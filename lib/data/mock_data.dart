@@ -1797,7 +1797,7 @@ class MockData {
     StoreStory(
       id: 'st1',
       storeId: 's1',
-      imageUrl: 'https://images.unsplash.com/photo-1547924765-16580479701b?auto=format&fit=crop&q=80&w=300',
+      imageUrl: 'https://images.unsplash.com/photo-1543007630-9710e4a00a20?auto=format&fit=crop&q=80&w=300',
       isLive: true,
       createdAt: _now.subtract(const Duration(minutes: 15)),
     ),
@@ -1840,7 +1840,7 @@ class MockData {
       userAvatar: 'https://i.pravatar.cc/150?u=rv1',
       content: '부모님 모시고 왔는데 너무 좋아하시네요. 씨앗호떡 진짜 맛있어요!',
       rating: 5.0,
-      images: ['https://images.unsplash.com/photo-1547924765-16580479701b?auto=format&fit=crop&q=80&w=300'],
+      images: ['https://images.unsplash.com/photo-1590301157890-4810ed352733?auto=format&fit=crop&q=80&w=300'],
       createdAt: _now.subtract(const Duration(days: 2)),
     ),
     StoreReview(

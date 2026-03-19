@@ -3,6 +3,8 @@ import 'package:intl/intl.dart';
 import '../../models/models.dart';
 import '../../data/mock_data.dart';
 import '../../theme/app_colors.dart';
+import '../../theme/sijang_design_system.dart';
+import '../../widgets/sds_widgets.dart';
 import '../../widgets/shrinkable_button.dart';
 import '../../widgets/app_ui.dart';
 import '../../services/favorite_service.dart';
@@ -15,65 +17,47 @@ class StoreDetailScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
     final zone = MockData.getZoneById(store.zoneId);
-    final daysSinceUpdate = store.lastUpdated != null
-        ? DateTime.now().difference(store.lastUpdated!).inDays
-        : null;
-    final isStale = (daysSinceUpdate ?? 0) > 7;
+    // final daysSinceUpdate = store.lastUpdated != null
+    //     ? DateTime.now().difference(store.lastUpdated!).inDays
+    //     : null;
+
+    // final isStale = (daysSinceUpdate ?? 0) > 7;
+
     final fmt = NumberFormat('#,###', 'ko_KR');
     final market = MockData.getMarket(store.marketName);
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      extendBodyBehindAppBar: true,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: Center(
-          child: ShrinkableButton(
-            onTap: () => Navigator.pop(context),
-            child: Container(
-              width: 36,
-              height: 36,
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.8),
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(Icons.arrow_back_ios_new_rounded, size: 18, color: AppColors.textPrimary),
-            ),
-          ),
-        ),
-        actions: [
-          Center(
-            child: ListenableBuilder(
-              listenable: FavoriteService(),
-              builder: (context, _) {
-                final isFav = FavoriteService().isFavorite(store.id);
-                return ShrinkableButton(
-                  onTap: () => FavoriteService().toggleFavorite(store.id),
-                  child: Padding(
-                    padding: const EdgeInsets.only(right: 16),
-                    child: Container(
-                      width: 36,
-                      height: 36,
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.8),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        isFav ? Icons.favorite_rounded : Icons.favorite_border_rounded,
-                        size: 20,
-                        color: isFav ? Colors.redAccent : AppColors.textPrimary,
-                      ),
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
-        ],
-      ),
       body: Column(
         children: [
+          // ── Premium Cinematic Top Bar (V16) ──────────────────────────
+          SDS.topBar(
+            context: context,
+            title: store.name,
+            subtitle: '${market.name}에서 사랑받는 점포예요 ✨',
+            actions: [
+              ListenableBuilder(
+                listenable: FavoriteService(),
+                builder: (context, _) {
+                  final isFav = FavoriteService().isFavorite(store.id);
+                  return _ActionIconButton(
+                    icon: isFav ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+                    color: isFav ? Colors.redAccent : AppColors.textPrimary,
+                    onTap: () => FavoriteService().toggleFavorite(store.id),
+                  );
+                },
+              ),
+              const SizedBox(width: 8),
+              _ActionIconButton(
+                icon: Icons.share_rounded,
+                onTap: () {
+                   ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('${store.name} 정보를 친구와 나누어 보세요!')),
+                  );
+                },
+              ),
+            ],
+          ),
           Expanded(
             child: SingleChildScrollView(
               child: Column(
@@ -100,143 +84,74 @@ class StoreDetailScreen extends StatelessWidget {
                         Hero(
                           tag: 'store_image_${store.id}',
                           child: Container(
-                            width: 120,
-                            height: 120,
+                            width: 130,
+                            height: 130,
                             decoration: BoxDecoration(
                               color: AppColors.surface,
-                              borderRadius: BorderRadius.circular(40),
-                              border: Border.all(
-                                color: AppColors.primary.withValues(alpha: 0.1),
-                                width: 2,
-                              ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: AppColors.primary.withValues(alpha: 0.15),
-                                  blurRadius: 40,
-                                  offset: const Offset(0, 15),
-                                ),
-                                BoxShadow(
-                                  color: Colors.white.withValues(alpha: 0.8),
-                                  blurRadius: 20,
-                                  offset: const Offset(0, -10),
-                                  spreadRadius: -5,
-                                ),
-                              ],
+                              borderRadius: BorderRadius.circular(SDS.radiusXL),
+                              boxShadow: SDS.shadowPremium,
                             ),
                             child: Center(
                               child: Icon(
                                 _iconForCategory(store.category),
-                                size: 56,
-                                color: AppColors.primary,
+                                size: 64,
+                                color: market.accentColor,
                               ),
                             ),
                           ),
                         ),
-                                          // --- Store Title and Quick Stats (V6 Staggered Entry) ---
-                  TweenAnimationBuilder<double>(
-                    tween: Tween(begin: 0.0, end: 1.0),
-                    duration: const Duration(milliseconds: 600),
-                    curve: Curves.easeOutCubic,
-                    builder: (context, value, child) {
-                      return Opacity(
-                        opacity: value,
-                        child: Transform.translate(
-                          offset: Offset(0, 30 * (1 - value)),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 24),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                                      decoration: BoxDecoration(
-                                        color: market.accentColor.withValues(alpha: 0.1),
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                      child: Text(
-                                        store.category,
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w900,
-                                          color: market.accentColor,
-                                          letterSpacing: 0.5,
-                                        ),
-                                      ),
-                                    ),
-                                    const SizedBox(width: 8),
-                                    if (store.unitNumber != null)
-                                      Text(
-                                        '호수: ${store.unitNumber}',
-                                        style: textTheme.bodySmall?.copyWith(
-                                          fontWeight: FontWeight.w700,
-                                          color: AppColors.textTertiary,
-                                        ),
-                                      ),
-                                  ],
-                                ),
-                                const SizedBox(height: 12),
-                                Text(
-                                  store.name,
-                                  style: textTheme.headlineMedium?.copyWith(
-                                    fontSize: 28, // Scaled down for better fit
-                                    fontWeight: FontWeight.w900,
-                                    color: AppColors.textPrimary,
-                                    letterSpacing: -1.0,
-                                    height: 1.25,
-                                  ),
-                                ),
-                                const SizedBox(height: 16),
-                                _StatusBadge(status: store.status),
-                              ],
-                            ),
+                        const SizedBox(height: 24),
+                        Text(
+                          '지금 이 가게는요',
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: SDS.fwBold,
+                            color: AppColors.textSecondary,
+                            letterSpacing: -0.3,
                           ),
                         ),
-                      );
-                    },
+                        const SizedBox(height: 10),
+                        _StatusBadge(status: store.status),
+                      ],
+                    ),
                   ),
-                        const SizedBox(height: 24),
-                        if (zone != null)
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-                            decoration: BoxDecoration(
-                              color: AppColors.surface,
-                              borderRadius: BorderRadius.circular(100),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withValues(alpha: 0.04),
-                                  blurRadius: 16,
-                                  offset: const Offset(0, 4),
-                                ),
-                              ],
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(Icons.location_on_rounded, size: 16, color: market.accentColor.withValues(alpha: 0.5)),
-                                const SizedBox(width: 8),
-                                Text(
-                                  '${zone.name} • ${store.unitNumber ?? "위치 정보 없음"}',
-                                  style: textTheme.bodyMedium?.copyWith(
-                                    fontWeight: FontWeight.w800,
-                                    color: AppColors.textPrimary,
-                                  ),
-                                ),
-                              ],
-                            ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          store.name,
+                          style: const TextStyle(
+                            fontSize: 32,
+                            fontWeight: SDS.fwBlack,
+                            letterSpacing: SDS.lsTight,
                           ),
-                        if (daysSinceUpdate != null) ...[
-                          const SizedBox(height: 16),
-                          Text(
-                            '마지막 업데이트: ${daysSinceUpdate == 0 ? "오늘" : daysSinceUpdate == 1 ? "어제" : "$daysSinceUpdate일 전"} (${store.infoSource ?? "시스템 제보"})',
-                            style: textTheme.bodySmall?.copyWith(
-                              fontWeight: FontWeight.w700,
-                              color: isStale ? AppColors.warning : AppColors.textTertiary,
-                              fontSize: 11,
+                        ),
+                        const SizedBox(height: 12),
+                        Row(
+                          children: [
+                            const Icon(Icons.location_on_rounded, size: 16, color: AppColors.textTertiary),
+                            const SizedBox(width: 8),
+                            Text(
+                              '${zone?.name ?? ""} • ${store.unitNumber ?? ""}호',
+                              style: const TextStyle(
+                                fontWeight: SDS.fwBold,
+                                color: AppColors.textSecondary,
+                              ),
                             ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          '방금 따끈따끈한 소식이 도착했어요 ✨',
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: SDS.fwBold,
+                            color: market.accentColor,
+                            letterSpacing: -0.3,
                           ),
-                        ],
+                        ),
                       ],
                     ),
                   ),
@@ -249,15 +164,16 @@ class StoreDetailScreen extends StatelessWidget {
                         // Payment methods
                         _SectionCard(
                           title: '결제 수단',
+                          delayMs: 400,
                           child: store.paymentMethods.isEmpty
                               ? AppEmptyState(
                                   icon: Icons.payments_outlined,
-                                  title: '결제 수단 정보가 없어요',
-                                  description: '방문 후 결제 방식을 알려주시면\n더 정확하게 안내할게요',
+                                  title: '어떤 결제 수단을 받으시나요?',
+                                  description: '직접 결제해본 경험을 알려주시면\n다른 분들에게 큰 도움이 돼요',
                                 )
                               : Wrap(
-                                  spacing: 10,
-                                  runSpacing: 10,
+                                  spacing: 12,
+                                  runSpacing: 12,
                                   children: store.paymentMethods
                                       .map((m) => _PaymentChip(method: m))
                                       .toList(),
@@ -269,11 +185,12 @@ class StoreDetailScreen extends StatelessWidget {
                         // Items
                         _SectionCard(
                           title: '대표 상품',
+                          delayMs: 500,
                           child: store.items.isEmpty
                               ? AppEmptyState(
                                   icon: Icons.inventory_2_outlined,
-                                  title: '대표 상품이 아직 등록되지 않았어요',
-                                  description: '이 가게에서 많이 파는 상품을\n알려주시면 빠르게 반영할게요',
+                                  title: '이 가게의 대표 상품을 알고 싶어요',
+                                  description: '가장 자신 있는 상품을 알려주시면\n이곳에 정성껏 소개해 드릴게요',
                                 )
                               : Column(
                                   children: store.items.asMap().entries.map((entry) {
@@ -342,91 +259,53 @@ class StoreDetailScreen extends StatelessWidget {
           ),
         ],
       ),
-      // --- Floating Control Center (V6 Capsule Design) ---
-      bottomNavigationBar: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
-          child: Container(
-            height: 84,
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            decoration: BoxDecoration(
-              color: AppColors.surface,
-              borderRadius: BorderRadius.circular(100), // Perfect Capsule
-              boxShadow: [
-                BoxShadow(
-                  color: market.accentColor.withValues(alpha: 0.15),
-                  blurRadius: 30,
-                  offset: const Offset(0, 10),
-                  spreadRadius: -5,
+      // --- Premium Bottom Action Bar (V13) ---
+      bottomNavigationBar: Container(
+        padding: EdgeInsets.fromLTRB(20, 12, 20, MediaQuery.of(context).padding.bottom + 12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          boxShadow: SDS.shadowPremium,
+          border: const Border(top: BorderSide(color: Color(0xFFF2F4F6))),
+        ),
+        child: Row(
+          children: [
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _ActionIconButton(
+                  icon: Icons.phone_rounded,
+                  onTap: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('${store.name}으로 전화를 연결해요! 📞')),
+                    );
+                  },
                 ),
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.08),
-                  blurRadius: 20,
-                  offset: const Offset(0, 6),
-                ),
+                const SizedBox(height: 6),
+                const Text('상담/전화', style: TextStyle(fontSize: 11, fontWeight: SDS.fwBold, color: AppColors.textSecondary)),
               ],
-              border: Border.all(
-                color: market.accentColor.withValues(alpha: 0.1),
-                width: 1.5,
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: SDS.button(
+                label: '길 안내 시작',
+                isPrimary: false,
+                icon: Icons.directions_rounded,
+                onTap: () => Navigator.pop(context, true),
               ),
             ),
-            child: Row(
-              children: [
-                const SizedBox(width: 12),
-                _ActionIconBtn(
-                  icon: Icons.phone_rounded,
-                  label: '전화',
-                  onTap: () {},
-                ),
-                const SizedBox(width: 8),
-                _ActionIconBtn(
-                  icon: Icons.share_rounded,
-                  label: '공유',
-                  onTap: () {},
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  flex: 3,
-                  child: ShrinkableButton(
-                    onTap: () {
-                      // Logic for reservation would go here
-                    },
-                    child: Container(
-                      height: 56,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [
-                            market.accentColor,
-                            market.accentColor.withValues(alpha: 0.8),
-                          ],
-                        ),
-                        borderRadius: BorderRadius.circular(100),
-                        boxShadow: [
-                          BoxShadow(
-                            color: market.accentColor.withValues(alpha: 0.3),
-                            blurRadius: 16,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: const Center(
-                        child: Text(
-                          '지금 예약하기',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w900,
-                            color: Colors.white,
-                            letterSpacing: -0.5,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-              ],
+            const SizedBox(width: 12),
+            Expanded(
+              child: SDS.button(
+                label: '점포 상품 예약',
+                color: market.accentColor,
+                onTap: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('곧 멋진 예약 시스템으로 찾아뵐게요!')),
+                  );
+                },
+              ),
             ),
-          ),
+          ],
         ),
       ),
     );
@@ -441,8 +320,8 @@ class StoreDetailScreen extends StatelessWidget {
       child: storeReviews.isEmpty
           ? AppEmptyState(
               icon: Icons.rate_review_outlined,
-              title: '첫 번째 리뷰를 남겨주세요',
-              description: '직접 방문한 경험을 공유하면\n다른 분들에게 큰 도움이 성돼요!',
+              title: '다녀오신 후 리뷰를 남겨주세요',
+              description: '직접 방문한 경험을 들려주시면\n다른 분들에게 큰 도움이 돼요!',
             )
           : Column(
               children: [
@@ -528,7 +407,7 @@ class StoreDetailScreen extends StatelessWidget {
                 )),
                 const SizedBox(height: 8),
                 ShrinkableButton(
-                  onTap: () {},
+                  onTap: () => _showReviewSubmitSheet(context),
                   child: Container(
                     width: double.infinity,
                     padding: const EdgeInsets.symmetric(vertical: 14),
@@ -557,7 +436,7 @@ class StoreDetailScreen extends StatelessWidget {
     
     final textTheme = Theme.of(context).textTheme;
     return _SectionCard(
-      title: '실시간 현황 ⚡',
+      title: '지금 가게 상황은 어때요? ⚡',
       child: Column(
         children: [
           if (store.freshness != null) ...[
@@ -572,7 +451,7 @@ class StoreDetailScreen extends StatelessWidget {
                           const Icon(Icons.verified_rounded, color: Color(0xFF10B981), size: 16),
                           const SizedBox(width: 6),
                           Text(
-                            '품질 신선도',
+                            '품질 신선도가 이만큼이에요',
                             style: textTheme.bodyMedium?.copyWith(
                               fontWeight: FontWeight.w700,
                               color: AppColors.textSecondary,
@@ -618,7 +497,7 @@ class StoreDetailScreen extends StatelessWidget {
                     const Icon(Icons.inventory_2_rounded, color: AppColors.primary, size: 16),
                     const SizedBox(width: 6),
                     Text(
-                      '재고 상태',
+                      '재고가 얼마나 남았을까요?',
                       style: textTheme.bodyMedium?.copyWith(
                         fontWeight: FontWeight.w700,
                         color: AppColors.textSecondary,
@@ -656,57 +535,116 @@ class StoreDetailScreen extends StatelessWidget {
     if (category.contains('건어물')) return Icons.water_drop_rounded;
     return Icons.storefront_rounded;
   }
+  void _showReviewSubmitSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => Container(
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
+        ),
+        padding: EdgeInsets.fromLTRB(24, 24, 24, MediaQuery.of(context).viewInsets.bottom + 40),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(color: AppColors.divider, borderRadius: BorderRadius.circular(2)),
+              ),
+            ),
+            const SizedBox(height: 24),
+            Text('방문은 어떠셨나요?', style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: SDS.fwBlack, letterSpacing: SDS.lsTight)),
+            const SizedBox(height: 8),
+            Text('이 가게에 대한 솔직한 후기를 들려주세요.', style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppColors.textSecondary)),
+            const SizedBox(height: 24),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: List.generate(5, (index) => Icon(Icons.star_rounded, size: 40, color: index < 4 ? AppColors.warning : AppColors.divider)),
+            ),
+            const SizedBox(height: 24),
+            TextField(
+              maxLines: 4,
+              decoration: InputDecoration(
+                hintText: '음식의 맛, 서비스, 분위기 등에 대해 알려주세요.',
+                filled: true,
+                fillColor: AppColors.background,
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
+              ),
+            ),
+            const SizedBox(height: 24),
+            AppPrimaryButton(
+              label: '리뷰를 등록할게요',
+              onPressed: () {
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('리뷰가 성공적으로 등록되었어요! ✨')));
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
 class _SectionCard extends StatelessWidget {
   final String title;
   final Widget child;
-  const _SectionCard({required this.title, required this.child});
+  final double delayMs;
+
+  const _SectionCard({
+    required this.title,
+    required this.child,
+    this.delayMs = 0,
+  });
 
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(28),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.03),
-            blurRadius: 20,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                width: 4,
-                height: 16,
-                decoration: BoxDecoration(
-                  color: AppColors.primary,
-                  borderRadius: BorderRadius.circular(10),
+    return SDSFadeIn(
+      delay: Duration(milliseconds: delayMs.toInt()),
+      child: Container(
+        width: double.infinity,
+        margin: const EdgeInsets.only(bottom: SDS.space24),
+        padding: const EdgeInsets.all(SDS.space24),
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(SDS.radiusL),
+          boxShadow: SDS.shadowPremium,
+          border: Border.all(color: AppColors.border.withValues(alpha: 0.3)),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  width: 4,
+                  height: 18,
+                  decoration: BoxDecoration(
+                    color: AppColors.primary,
+                    borderRadius: BorderRadius.circular(SDS.radiusS),
+                  ),
                 ),
-              ),
-              const SizedBox(width: 10),
-              Text(
-                title,
-                style: textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w900,
-                  color: AppColors.textPrimary,
-                  letterSpacing: -0.4,
+                const SizedBox(width: 10),
+                Text(
+                  title,
+                  style: textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.w900,
+                    color: AppColors.textPrimary,
+                    letterSpacing: -0.5,
+                  ),
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 20),
-          child,
-        ],
+              ],
+            ),
+            const SizedBox(height: SDS.space20),
+            child,
+          ],
+        ),
       ),
     );
   }
@@ -820,46 +758,31 @@ class _PaymentChip extends StatelessWidget {
   }
 }
 
-class _ActionIconBtn extends StatelessWidget {
+// Removed unused _ActionIconBtn
+
+class _ActionIconButton extends StatelessWidget {
   final IconData icon;
-  final String label;
+  final Color? color;
   final VoidCallback onTap;
 
-  const _ActionIconBtn({
+  const _ActionIconButton({
     required this.icon,
-    required this.label,
+    this.color,
     required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-      child: ShrinkableButton(
-        onTap: onTap,
-        child: Container(
-          height: 64,
-          decoration: BoxDecoration(
-            color: AppColors.background,
-            borderRadius: BorderRadius.circular(18),
-            border: Border.all(color: AppColors.border.withValues(alpha: 0.5)),
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(icon, size: 20, color: AppColors.textSecondary),
-              const SizedBox(height: 4),
-              Text(
-                label,
-                style: TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w800,
-                  color: AppColors.textSecondary,
-                  letterSpacing: -0.2,
-                ),
-              ),
-            ],
-          ),
+    return ShrinkableButton(
+      onTap: onTap,
+      child: Container(
+        width: 44,
+        height: 44,
+        decoration: BoxDecoration(
+          color: const Color(0xFFF2F4F6),
+          borderRadius: BorderRadius.circular(SDS.radiusM),
         ),
+        child: Icon(icon, color: color ?? const Color(0xFF4E5968), size: 22),
       ),
     );
   }
