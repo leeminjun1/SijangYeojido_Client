@@ -436,7 +436,7 @@ class _CircularActionButton extends StatelessWidget {
             width: 64,
             height: 64,
             decoration: BoxDecoration(
-              color: imagePath != null ? Colors.white : color.withValues(alpha: 0.1),
+              color: color.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(22),
               boxShadow: [
                 BoxShadow(
@@ -447,17 +447,7 @@ class _CircularActionButton extends StatelessWidget {
               ],
             ),
             child: Center(
-              child: imagePath != null
-                  ? ClipRRect(
-                      borderRadius: BorderRadius.circular(12),
-                      child: Image.asset(
-                        imagePath!,
-                        width: 48,
-                        height: 48,
-                        fit: BoxFit.contain,
-                      ),
-                    )
-                  : Icon(icon, size: 28, color: color),
+              child: Icon(icon, size: 28, color: color),
             ),
           ),
           const SizedBox(height: 10),

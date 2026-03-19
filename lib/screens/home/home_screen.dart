@@ -8,8 +8,6 @@ import '../../widgets/shrinkable_button.dart';
 import 'package:sijangyeojido_client/screens/map/market_hub_screen.dart';
 import '../../widgets/skeleton.dart';
 import '../explore/search_screen.dart';
-import '../../services/favorite_service.dart';
-import '../map/store_detail_screen.dart';
 import '../../widgets/market_stories.dart';
 import '../../widgets/flash_deal_ticker.dart';
 import '../../widgets/sds_widgets.dart';
@@ -46,7 +44,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
     final bottomPadding = MediaQuery.of(context).padding.bottom;
     final openCount = MockData.stores.where((s) => s.status == StoreStatus.open).length;
 
