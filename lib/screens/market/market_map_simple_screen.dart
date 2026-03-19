@@ -49,7 +49,7 @@ class MarketMapSimpleScreen extends StatelessWidget {
                 ),
                 // Mock Zone Markers
                 _buildZoneMarker(context, 'A구역', 0.25, 0.35, AppColors.primary),
-                _buildZoneMarker(context, 'B구역', 0.65, 0.45, AppColors.secondary),
+                _buildZoneMarker(context, 'B구역', 0.65, 0.45, AppColors.blue),
                 _buildZoneMarker(context, 'C구역', 0.45, 0.75, AppColors.accent),
               ],
             ),
@@ -137,7 +137,7 @@ class MarketMapSimpleScreen extends StatelessWidget {
           const SizedBox(height: 16),
           _buildLegendItem('A구역 (먹거리 골목)', AppColors.primary),
           const SizedBox(height: 12),
-          _buildLegendItem('B구역 (포목/직물 주단)', AppColors.secondary),
+          _buildLegendItem('B구역 (포목/직물 주단)', AppColors.blue),
           const SizedBox(height: 12),
           _buildLegendItem('C구역 (숨은 로컬 명소)', AppColors.accent),
           SizedBox(height: MediaQuery.of(context).padding.bottom),
